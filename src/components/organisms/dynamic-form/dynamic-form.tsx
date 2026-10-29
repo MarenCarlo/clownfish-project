@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Card } from '@/components/atoms/card';
 import { Button } from '@/components/atoms/button';
 import { Alert } from '@/components/molecules/alert';
@@ -31,7 +31,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   className = '',
   showCardWrapper = true,
 }) => {
-  // Inicialización de valores por defecto desde el esquema
+  // Inicializacion de valores por defecto desde el esquema
   const [values, setValues] = useState<FormValues>(() => {
     const defaults: FormValues = {};
     schema.fields.forEach((field) => {
@@ -45,13 +45,22 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
-  // Validación de un campo individual
+  // Ordenamiento reactivo por la propiedad 'order' (entero)
+  const sortedFields = useMemo(() => {
+    return [...schema.fields].sort((a, b) => {
+      const orderA = a.order ?? 0;
+      const orderB = b.order ?? 0;
+      return orderA - orderB;
+    });
+  }, [schema.fields]);
+
+  // Validacion de un campo individual
   const validateField = useCallback(
     (field: FormFieldSchema, val: unknown, allValues: FormValues): string | undefined => {
       const v = field.validation;
       if (!v) return undefined;
 
-      // Validación de Requerido
+      // Validacion de Requerido
       if (v.required) {
         const reqMessage =
           typeof v.required === 'string'
@@ -66,7 +75,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         }
       }
 
-      // Si el campo está vacío y no es requerido, omitir resto de validaciones
+      // Si el campo esta vacio y no es requerido, omitir resto de validaciones
       if (val === undefined || val === null || val === '') {
         return undefined;
       }
@@ -102,7 +111,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         }
       }
 
-      // Validación de tamaño para archivo
+      // Validacion de tamano para archivo
       if (field.type === 'file' && (v.maxSizeMb || field.maxSizeMb)) {
         const limitMb = v.maxSizeMb ?? field.maxSizeMb!;
         const limitBytes = limitMb * 1024 * 1024;
@@ -179,7 +188,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       try {
         setIsSubmitting(true);
         await onSubmit(values);
-        setSubmitSuccess('¡Formulario enviado y procesado con éxito!');
+        setSubmitSuccess('Formulario enviado y procesado con éxito.');
       } catch (err: unknown) {
         const message =
           err instanceof Error
@@ -257,14 +266,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         <Alert variant="error" title="Error en el formulario" description={errors._form} />
       )}
 
-      {/* Alerta de Éxito */}
+      {/* Alerta de Exito */}
       {submitSuccess && (
         <Alert variant="success" title="Completado" description={submitSuccess} />
       )}
 
-      {/* Cuadrícula dinámica de campos */}
+      {/* Cuadricula dinamica ordenada por 'order' */}
       <div className={`grid gap-5 ${getGridColsClass()}`}>
-        {schema.fields.map((field) => (
+        {sortedFields.map((field) => (
           <div key={field.id} className={getColSpanClass(field.colSpan)}>
             <DynamicFormField
               field={field}

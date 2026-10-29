@@ -60,13 +60,13 @@ export const OverviewDashboard: React.FC = () => {
               Estructura de Directorios
             </span>
             <ul className="space-y-1.5 font-mono text-[11px] text-gray-600 dark:text-gray-400">
-              <li>📁 <span className="text-blue-600 dark:text-blue-400">src/components/atoms</span>: Button, Input, Badge, Card, Spinner</li>
-              <li>📁 <span className="text-blue-600 dark:text-blue-400">src/components/molecules</span>: FormField, Alert, StatCard</li>
-              <li>📁 <span className="text-blue-600 dark:text-blue-400">src/components/organisms</span>: Navbar, Footer</li>
-              <li>📁 <span className="text-blue-600 dark:text-blue-400">src/components/templates</span>: MainTemplate</li>
-              <li>📁 <span className="text-emerald-600 dark:text-emerald-400">src/modules/overview</span>: Feature components & hooks</li>
-              <li>📁 <span className="text-purple-600 dark:text-purple-400">src/server/api</span>: tRPC context, router & procedures</li>
-              <li>📁 <span className="text-purple-600 dark:text-purple-400">src/app/api/trpc</span>: HTTP Fetch Route Handler</li>
+              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/atoms</span>: Button, Input, Textarea, Select, FileInput, Badge, Card, Spinner</li>
+              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/molecules</span>: FormField, DynamicFormField, Alert, StatCard</li>
+              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/organisms</span>: DynamicForm, Navbar, Footer</li>
+              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/templates</span>: MainTemplate</li>
+              <li><span className="text-emerald-600 dark:text-emerald-400 font-semibold">src/modules/overview</span>: Feature components & hooks</li>
+              <li><span className="text-purple-600 dark:text-purple-400 font-semibold">src/server/api</span>: tRPC context, router & procedures</li>
+              <li><span className="text-purple-600 dark:text-purple-400 font-semibold">src/app/api/trpc</span>: HTTP Fetch Route Handler</li>
             </ul>
           </div>
         </div>

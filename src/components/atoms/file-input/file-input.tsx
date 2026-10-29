@@ -132,7 +132,19 @@ export const FileInput: React.FC<FileInputProps> = ({
               className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs"
             >
               <div className="flex items-center gap-2 truncate pr-2">
-                <span className="text-gray-400">📄</span>
+                <svg
+                  className="w-4 h-4 text-gray-400 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
                 <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
                   {file.name}
                 </span>
@@ -147,7 +159,19 @@ export const FileInput: React.FC<FileInputProps> = ({
                 className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 transition-colors p-1"
                 title="Eliminar archivo"
               >
-                ✕
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
               </button>
             </div>
           ))}

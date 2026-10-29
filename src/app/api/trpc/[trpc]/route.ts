@@ -12,7 +12,7 @@ const handler = (req: Request) =>
       process.env.NODE_ENV === 'development'
         ? ({ path, error }) => {
             console.error(
-              `❌ tRPC falló en ${path ?? '<sin-ruta>'}: ${error.message}`
+              `[tRPC Error] Fallo en ${path ?? '<sin-ruta>'}: ${error.message}`
             );
           }
         : undefined,

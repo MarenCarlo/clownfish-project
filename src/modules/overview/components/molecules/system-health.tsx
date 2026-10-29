@@ -51,7 +51,7 @@ export const SystemHealth: React.FC = () => {
           Estado del Servidor (tRPC)
         </span>
         <Badge variant={data?.status === 'ok' ? 'success' : 'warning'} size="sm">
-          {data?.status === 'ok' ? '● En Línea' : 'Desconocido'}
+          {data?.status === 'ok' ? 'En Línea' : 'Desconocido'}
         </Badge>
       </div>
 

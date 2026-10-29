@@ -28,6 +28,7 @@ export interface FieldValidation {
 
 export interface FormFieldSchema {
   id: string;
+  order?: number;
   name?: string;
   type: DynamicFieldType;
   label: string;
@@ -38,21 +39,21 @@ export interface FormFieldSchema {
   readOnly?: boolean;
   validation?: FieldValidation;
 
-  // Specific to 'select'
+  // Especifico para select
   options?: SelectOption[];
 
-  // Specific to 'file'
+  // Especifico para file
   accept?: string;
   multiple?: boolean;
   maxSizeMb?: number;
 
-  // Specific to 'number'
+  // Especifico para number
   step?: number | string;
 
-  // Specific to 'textarea'
+  // Especifico para textarea
   rows?: number;
 
-  // Grid layout column span (1 to 12)
+  // Espacio de columnas en grid (1 a 12)
   colSpan?: 1 | 2 | 3 | 4 | 6 | 12;
 }
 
