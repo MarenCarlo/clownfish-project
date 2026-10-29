@@ -1,6 +1,5 @@
 import React from 'react';
 import { Navbar } from '@/components/organisms/navbar';
-import { Footer } from '@/components/organisms/footer';
 
 export interface MainTemplateProps {
   children: React.ReactNode;
@@ -12,7 +11,7 @@ export interface MainTemplateProps {
 export const MainTemplate: React.FC<MainTemplateProps> = ({
   children,
   header = <Navbar />,
-  footer = <Footer />,
+  footer,
   hero,
 }) => {
   return (

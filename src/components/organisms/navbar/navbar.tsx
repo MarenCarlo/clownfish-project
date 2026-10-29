@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { Badge } from '@/components/atoms/badge';
 
 export interface NavbarProps {
   title?: string;
@@ -11,7 +10,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
     <header className="sticky top-0 z-40 w-full border-b border-black bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-none border border-black bg-white flex items-center justify-center text-black">
               <svg
                 className="w-4 h-4"
@@ -31,34 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
               {title}
             </span>
           </Link>
-          <Badge variant="neutral" size="sm">
-            Next.js 16 + tRPC
-          </Badge>
         </div>
-
-        <nav className="flex items-center gap-4 text-sm font-medium text-black">
-          <Link
-            href="/"
-            className="hover:underline"
-          >
-            Inicio
-          </Link>
-          <Link
-            href="/api/trpc/health.check"
-            target="_blank"
-            className="hover:underline"
-          >
-            Health API
-          </Link>
-          <a
-            href="https://trpc.io"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:underline"
-          >
-            Docs tRPC
-          </a>
-        </nav>
       </div>
     </header>
   );
