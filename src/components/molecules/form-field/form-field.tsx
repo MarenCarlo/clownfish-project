@@ -15,15 +15,15 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
       <div className="flex flex-col gap-1.5 w-full">
         <label
           htmlFor={inputId}
-          className="text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="text-sm font-medium text-black"
         >
           {label}
         </label>
         <Input ref={ref} id={inputId} isError={Boolean(error)} {...inputProps} />
         {error ? (
-          <span className="text-xs text-rose-500 font-medium">{error}</span>
+          <span className="text-xs text-status-error font-medium">{error}</span>
         ) : helperText ? (
-          <span className="text-xs text-gray-500 dark:text-gray-400">
+          <span className="text-xs text-black">
             {helperText}
           </span>
         ) : null}

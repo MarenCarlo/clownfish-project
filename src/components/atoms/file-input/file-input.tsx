@@ -71,14 +71,14 @@ export const FileInput: React.FC<FileInputProps> = ({
           setIsDragging(false);
           if (!disabled) handleFiles(e.dataTransfer.files);
         }}
-        className={`group relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+        className={`group relative flex flex-col items-center justify-center p-6 border border-dashed rounded-none bg-white cursor-pointer transition-colors ${
           disabled
-            ? 'opacity-50 cursor-not-allowed bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-800'
+            ? 'opacity-40 cursor-not-allowed border-black'
             : isError
-            ? 'border-red-400 bg-red-50/30 dark:bg-red-950/20 hover:border-red-500'
+            ? 'border-status-error'
             : isDragging
-            ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/30'
-            : 'border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 hover:border-blue-400'
+            ? 'border-solid border-black'
+            : 'border-black hover:border-solid'
         }`}
       >
         <input
@@ -93,7 +93,7 @@ export const FileInput: React.FC<FileInputProps> = ({
         />
 
         <div className="flex flex-col items-center text-center gap-1.5">
-          <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-1 group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 rounded-none border border-black bg-white flex items-center justify-center text-black mb-1">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -108,13 +108,13 @@ export const FileInput: React.FC<FileInputProps> = ({
               />
             </svg>
           </div>
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            <span className="text-blue-600 dark:text-blue-400 underline decoration-blue-400/50">
+          <p className="text-sm font-medium text-black">
+            <span className="underline">
               Haz clic para subir
             </span>{' '}
             o arrastra archivos aquí
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-black">
             {hint ??
               `${accept ? `Formatos: ${accept}` : 'Cualquier archivo'} ${
                 maxSizeMb ? `(Máx. ${maxSizeMb} MB)` : ''
@@ -129,11 +129,11 @@ export const FileInput: React.FC<FileInputProps> = ({
           {selectedFiles.map((file, idx) => (
             <div
               key={`${file.name}-${idx}`}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs"
+              className="flex items-center justify-between px-3 py-2 rounded-none bg-white border border-black text-xs text-black"
             >
               <div className="flex items-center gap-2 truncate pr-2">
                 <svg
-                  className="w-4 h-4 text-gray-400 shrink-0"
+                  className="w-4 h-4 text-black shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -145,10 +145,10 @@ export const FileInput: React.FC<FileInputProps> = ({
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <span className="font-medium text-gray-800 dark:text-gray-200 truncate">
+                <span className="font-medium text-black truncate">
                   {file.name}
                 </span>
-                <span className="text-gray-400 text-[10px]">
+                <span className="text-black text-[10px]">
                   ({formatFileSize(file.size)})
                 </span>
               </div>
@@ -156,7 +156,7 @@ export const FileInput: React.FC<FileInputProps> = ({
                 type="button"
                 onClick={(e) => handleRemove(idx, e)}
                 disabled={disabled}
-                className="text-gray-400 hover:text-rose-500 dark:hover:text-rose-400 transition-colors p-1"
+                className="text-black hover:text-status-error transition-colors p-1 cursor-pointer"
                 title="Eliminar archivo"
               >
                 <svg

@@ -120,7 +120,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 
       default:
         return (
-          <div className="text-xs text-rose-500">
+          <div className="text-xs text-status-error">
             Tipo de campo no soportado: {(field as { type: string }).type}
           </div>
         );
@@ -132,17 +132,17 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       <div className="flex items-center justify-between">
         <label
           htmlFor={fieldId}
-          className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1"
+          className="text-sm font-medium text-black flex items-center gap-1"
         >
           {field.label}
-          {isRequired && <span className="text-rose-500 font-bold">*</span>}
+          {isRequired && <span className="text-status-error font-bold">*</span>}
         </label>
       </div>
 
       {renderControl()}
 
       {error ? (
-        <span className="text-xs text-rose-500 font-medium flex items-center gap-1">
+        <span className="text-xs text-status-error font-medium flex items-center gap-1">
           <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -153,7 +153,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           {error}
         </span>
       ) : field.type !== 'file' && field.helperText ? (
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+        <span className="text-xs text-black">
           {field.helperText}
         </span>
       ) : null}

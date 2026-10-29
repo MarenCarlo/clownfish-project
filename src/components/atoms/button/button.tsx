@@ -20,19 +20,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+      'inline-flex items-center justify-center rounded-none transition-colors focus:outline-none focus:ring-1 focus:ring-black disabled:opacity-40 disabled:pointer-events-none cursor-pointer';
 
     const variants: Record<string, string> = {
       primary:
-        'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm',
+        'bg-white text-black border border-black font-semibold hover:bg-black hover:text-white',
       secondary:
-        'bg-gray-800 text-gray-100 hover:bg-gray-700 dark:bg-gray-200 dark:text-gray-900 dark:hover:bg-gray-300 focus:ring-gray-400',
+        'bg-white text-black border border-black font-medium hover:bg-black hover:text-white',
       outline:
-        'border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 focus:ring-blue-500',
+        'bg-white text-black border border-black font-normal hover:bg-black hover:text-white',
       ghost:
-        'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:ring-gray-400',
+        'bg-white text-black border border-transparent hover:border-black',
       danger:
-        'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm',
+        'bg-white text-status-error border border-status-error font-semibold hover:bg-status-error hover:text-white focus:ring-status-error',
     };
 
     const sizes: Record<string, string> = {

@@ -30,15 +30,15 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           disabled={disabled}
-          className={`w-full appearance-none px-3.5 py-2.5 pr-10 text-sm rounded-lg border bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800 cursor-pointer ${
+          className={`w-full appearance-none px-3.5 py-2.5 pr-10 text-sm rounded-none border bg-white text-black transition-colors focus:outline-none focus:ring-1 disabled:opacity-40 cursor-pointer ${
             isError
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-gray-700 focus:border-blue-500 focus:ring-blue-500'
+              ? 'border-status-error text-status-error focus:ring-status-error'
+              : 'border-black focus:border-black focus:ring-black'
           } ${className}`}
           {...props}
         >
           {placeholder && (
-            <option value="" disabled className="text-gray-400">
+            <option value="" disabled className="text-black/60">
               {placeholder}
             </option>
           )}
@@ -48,13 +48,14 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
                   key={String(opt.value)}
                   value={opt.value}
                   disabled={opt.disabled}
+                  className="bg-white text-black"
                 >
                   {opt.label}
                 </option>
               ))
             : children}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 dark:text-gray-400">
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-black">
           <svg
             className="h-4 w-4 fill-current"
             xmlns="http://www.w3.org/2000/svg"

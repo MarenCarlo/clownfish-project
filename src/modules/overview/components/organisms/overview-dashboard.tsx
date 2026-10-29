@@ -55,18 +55,18 @@ export const OverviewDashboard: React.FC = () => {
           <SystemHealth />
 
           {/* Architecture Summary Box */}
-          <div className="p-5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 text-xs flex flex-col gap-3">
-            <span className="font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
+          <div className="p-5 rounded-none border border-black bg-white text-xs text-black flex flex-col gap-3">
+            <span className="font-semibold text-black uppercase tracking-wider">
               Estructura de Directorios
             </span>
-            <ul className="space-y-1.5 font-mono text-[11px] text-gray-600 dark:text-gray-400">
-              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/atoms</span>: Button, Input, Textarea, Select, FileInput, Badge, Card, Spinner</li>
-              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/molecules</span>: FormField, DynamicFormField, Alert, StatCard</li>
-              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/organisms</span>: DynamicForm, Navbar, Footer</li>
-              <li><span className="text-blue-600 dark:text-blue-400 font-semibold">src/components/templates</span>: MainTemplate</li>
-              <li><span className="text-emerald-600 dark:text-emerald-400 font-semibold">src/modules/overview</span>: Feature components & hooks</li>
-              <li><span className="text-purple-600 dark:text-purple-400 font-semibold">src/server/api</span>: tRPC context, router & procedures</li>
-              <li><span className="text-purple-600 dark:text-purple-400 font-semibold">src/app/api/trpc</span>: HTTP Fetch Route Handler</li>
+            <ul className="space-y-1.5 font-mono text-[11px] text-black">
+              <li><span className="font-semibold underline">src/components/atoms</span>: Button, Input, Textarea, Select, FileInput, Badge, Card, Spinner</li>
+              <li><span className="font-semibold underline">src/components/molecules</span>: FormField, DynamicFormField, Alert, StatCard</li>
+              <li><span className="font-semibold underline">src/components/organisms</span>: DynamicForm, Navbar, Footer</li>
+              <li><span className="font-semibold underline">src/components/templates</span>: MainTemplate</li>
+              <li><span className="font-semibold underline">src/modules/overview</span>: Feature components & hooks</li>
+              <li><span className="font-semibold underline">src/server/api</span>: tRPC context, router & procedures</li>
+              <li><span className="font-semibold underline">src/app/api/trpc</span>: HTTP Fetch Route Handler</li>
             </ul>
           </div>
         </div>

@@ -8,11 +8,11 @@ export interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-black bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-none border border-black bg-white flex items-center justify-center text-black">
               <svg
                 className="w-4 h-4"
                 fill="none"
@@ -27,26 +27,26 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
                 />
               </svg>
             </div>
-            <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+            <span className="font-bold text-lg text-black">
               {title}
             </span>
           </Link>
-          <Badge variant="info" size="sm">
+          <Badge variant="neutral" size="sm">
             Next.js 16 + tRPC
           </Badge>
         </div>
 
-        <nav className="flex items-center gap-4 text-sm font-medium text-gray-600 dark:text-gray-300">
+        <nav className="flex items-center gap-4 text-sm font-medium text-black">
           <Link
             href="/"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="hover:underline"
           >
             Inicio
           </Link>
           <Link
             href="/api/trpc/health.check"
             target="_blank"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="hover:underline"
           >
             Health API
           </Link>
@@ -54,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
             href="https://trpc.io"
             target="_blank"
             rel="noreferrer"
-            className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="hover:underline"
           >
             Docs tRPC
           </a>

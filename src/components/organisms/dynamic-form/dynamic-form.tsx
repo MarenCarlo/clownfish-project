@@ -247,14 +247,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
       {/* Encabezado opcional */}
       {(schema.title || schema.description) && (
-        <div className="border-b border-gray-200 dark:border-gray-800 pb-4">
+        <div className="border-b border-black pb-4">
           {schema.title && (
-            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            <h3 className="text-lg font-bold text-black">
               {schema.title}
             </h3>
           )}
           {schema.description && (
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-black mt-1">
               {schema.description}
             </p>
           )}
@@ -288,7 +288,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       </div>
 
       {/* Barra de Acciones */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-black">
         {schema.resetText && (
           <Button
             type="button"

@@ -15,20 +15,16 @@ export const Alert: React.FC<AlertProps> = ({
   className = '',
 }) => {
   const containerVariants: Record<string, string> = {
-    info: 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900',
-    success:
-      'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-900',
-    warning:
-      'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900',
-    error:
-      'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900',
-    neutral:
-      'bg-gray-50 dark:bg-gray-900/50 border-gray-200 dark:border-gray-800',
+    info: 'bg-white border-status-info text-status-info',
+    success: 'bg-white border-status-success text-status-success',
+    warning: 'bg-white border-status-warning text-status-warning',
+    error: 'bg-white border-status-error text-status-error',
+    neutral: 'bg-white border-black text-black',
   };
 
   return (
     <div
-      className={`flex items-start gap-3 p-4 rounded-xl border ${
+      className={`flex items-start gap-3 p-4 rounded-none border ${
         containerVariants[variant ?? 'info']
       } ${className}`}
     >
@@ -36,11 +32,11 @@ export const Alert: React.FC<AlertProps> = ({
         {variant?.toUpperCase()}
       </Badge>
       <div className="flex flex-col gap-0.5">
-        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+        <h4 className="text-sm font-semibold text-current">
           {title}
         </h4>
         {description && (
-          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p className="text-xs text-current leading-relaxed">
             {description}
           </p>
         )}

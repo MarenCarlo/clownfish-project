@@ -14,13 +14,13 @@ export const StatCard: React.FC<StatCardProps> = ({
   label,
   value,
   badgeText,
-  badgeVariant = 'info',
+  badgeVariant = 'neutral',
   caption,
 }) => {
   return (
     <Card className="flex flex-col gap-2">
       <div className="flex items-center justify-between">
-        <span className="text-xs uppercase tracking-wider font-semibold text-gray-500 dark:text-gray-400">
+        <span className="text-xs uppercase tracking-wider font-semibold text-black">
           {label}
         </span>
         {badgeText && (
@@ -29,11 +29,11 @@ export const StatCard: React.FC<StatCardProps> = ({
           </Badge>
         )}
       </div>
-      <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+      <div className="text-2xl font-bold text-black">
         {value}
       </div>
       {caption && (
-        <span className="text-xs text-gray-500 dark:text-gray-400">{caption}</span>
+        <span className="text-xs text-black">{caption}</span>
       )}
     </Card>
   );

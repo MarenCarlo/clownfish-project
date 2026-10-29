@@ -12,8 +12,8 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-xl bg-white dark:bg-gray-900 shadow-sm p-6 ${
-        bordered ? 'border border-gray-200 dark:border-gray-800' : ''
+      className={`rounded-none bg-white text-black p-6 ${
+        bordered ? 'border border-black' : ''
       } ${className}`}
       {...props}
     >
