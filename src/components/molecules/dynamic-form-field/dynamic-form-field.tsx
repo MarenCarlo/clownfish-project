@@ -26,6 +26,16 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   const isDisabled = disabled || field.disabled;
   const isError = Boolean(error);
   const fieldId = field.id;
+  const fieldName = field.name || field.id;
+
+  const serializedLabelValue =
+    value instanceof File
+      ? value.name
+      : Array.isArray(value)
+      ? value.map((item) => (item instanceof File ? item.name : String(item))).join(',')
+      : value !== undefined && value !== null
+      ? String(value)
+      : '';
 
   const renderControl = () => {
     switch (field.type) {
@@ -37,7 +47,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <Input
             id={fieldId}
-            name={field.name ?? field.id}
+            name={fieldName}
             type={field.type}
             placeholder={field.placeholder}
             value={typeof value === 'string' || typeof value === 'number' ? value : ''}
@@ -53,7 +63,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <Input
             id={fieldId}
-            name={field.name ?? field.id}
+            name={fieldName}
             type="number"
             step={field.step}
             min={field.validation?.min}
@@ -75,7 +85,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <Textarea
             id={fieldId}
-            name={field.name ?? field.id}
+            name={fieldName}
             rows={field.rows ?? 4}
             placeholder={field.placeholder}
             value={typeof value === 'string' ? value : ''}
@@ -91,7 +101,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <Select
             id={fieldId}
-            name={field.name ?? field.id}
+            name={fieldName}
             options={field.options}
             placeholder={field.placeholder ?? 'Selecciona una opción...'}
             value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
@@ -106,7 +116,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <FileInput
             id={fieldId}
-            name={field.name ?? field.id}
+            name={fieldName}
             accept={field.accept}
             multiple={field.multiple}
             maxSizeMb={field.maxSizeMb ?? field.validation?.maxSizeMb}
@@ -132,6 +142,8 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       <div className="flex items-center justify-between">
         <label
           htmlFor={fieldId}
+          data-name={fieldName}
+          data-value={serializedLabelValue}
           className="text-sm font-medium text-black flex items-center gap-1"
         >
           {field.label}

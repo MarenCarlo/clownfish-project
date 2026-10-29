@@ -29,7 +29,8 @@ export interface FieldValidation {
 export interface FormFieldSchema {
   id: string;
   order?: number;
-  name?: string;
+  name: string;
+  value?: unknown;
   type: DynamicFieldType;
   label: string;
   placeholder?: string;
@@ -72,3 +73,97 @@ export interface DynamicFormSchema {
 
 export type FormValues = Record<string, unknown>;
 export type FormErrors = Record<string, string | undefined>;
+
+/**
+ * Construye dinámicamente el objeto JSON de valores (objectForm)
+ * en base a los `name` y `value` definidos en el esquema.
+ */
+export function buildFormObject(schema: DynamicFormSchema): FormValues {
+  return schema.fields.reduce<FormValues>((acc, field) => {
+    const key = field.name || field.id;
+    acc[key] =
+      field.value ??
+      field.defaultValue ??
+      (field.type === 'file' ? null : '');
+    return acc;
+  }, {});
+}
+
+export const defaultFormSchema: DynamicFormSchema = {
+  id: 'main-form',
+  layout: {
+    columns: 2,
+    gap: 'md',
+  },
+  fields: [
+    {
+      id: 'input_text',
+      order: 1,
+      type: 'text',
+      label: 'Texto',
+      name: 'texto',
+      value: '',
+      placeholder: 'Ingrese texto...',
+      colSpan: 1,
+    },
+    {
+      id: 'input_number',
+      order: 2,
+      type: 'number',
+      label: 'Número',
+      name: 'numero',
+      value: 0,
+      placeholder: '0',
+      colSpan: 1,
+    },
+    {
+      id: 'input_select',
+      order: 3,
+      type: 'select',
+      label: 'Selección',
+      name: 'seleccion',
+      value: '',
+      placeholder: 'Seleccione una opción...',
+      options: [
+        { label: 'Opción 1', value: '1' },
+        { label: 'Opción 2', value: '2' },
+        { label: 'Opción 3', value: '3' },
+      ],
+      colSpan: 1,
+    },
+    {
+      id: 'input_file',
+      order: 4,
+      type: 'file',
+      label: 'Archivo',
+      name: 'archivo',
+      value: null,
+      colSpan: 1,
+    },
+    {
+      id: 'input_textarea',
+      order: 5,
+      type: 'textarea',
+      label: 'Descripción',
+      name: 'descripcion',
+      value: '',
+      placeholder: 'Ingrese contenido...',
+      rows: 4,
+      colSpan: 2,
+    },
+  ],
+};
+
+/**
+ * Objeto secundario que almacena los valores dinámicos del formulario
+ * construidos a partir de los `name` de `defaultFormSchema`.
+ */
+export const objectForm: FormValues = buildFormObject(defaultFormSchema);
+
+export function syncObjectForm(values: FormValues): FormValues {
+  Object.keys(objectForm).forEach((key) => {
+    delete objectForm[key];
+  });
+  Object.assign(objectForm, values);
+  return objectForm;
+}

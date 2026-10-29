@@ -33,13 +33,17 @@ Cada campo dentro del array `fields` del esquema JSON admite la propiedad numér
 
 ```json
 {
-  "id": "correo",
+  "id": "input_email",
+  "name": "correo",
+  "value": "",
   "type": "email",
   "label": "Correo Electrónico",
   "order": 1
 },
 {
-  "id": "nombre",
+  "id": "input_name",
+  "name": "nombre",
+  "value": "",
   "type": "text",
   "label": "Nombre Completo",
   "order": 2
@@ -47,16 +51,35 @@ Cada campo dentro del array `fields` del esquema JSON admite la propiedad numér
 ```
 
 * El componente evalúa y ordena la lista de campos en memoria según el valor entero ascendente de `order`.
-* Si se modifica dinámicamente el valor de `order` en el esquema (por ejemplo, mediante estado de React o una respuesta de API), el formulario se reorganiza automáticamente en tiempo real sin perder los datos ya introducidos en los campos.
-* Si se omite la propiedad `order` en un campo, su valor por defecto se considera `0`.
+* Si se modifica dinámicamente el valor de `order` en el esquema, el formulario se reorganiza automáticamente en tiempo real sin perder los datos ya introducidos.
 
 ---
 
-## 3. Diccionario del Esquema JSON
+## 3. Construcción Dinámica de `objectForm`
+
+Junto al esquema (`defaultFormSchema`), se utiliza la utilidad `buildFormObject(schema)` para construir automáticamente `objectForm`. Este objeto secundario toma los `name` y `value` de cada campo del esquema para mantener sincronizados todos los parámetros que se enviarán al realizar un POST:
+
+```ts
+export const objectForm: FormValues = buildFormObject(defaultFormSchema);
+// Resultado inicial:
+// {
+//   texto: '',
+//   numero: 0,
+//   seleccion: '',
+//   archivo: null,
+//   descripcion: ''
+// }
+```
+
+Al pasar `objectForm` al componente `<DynamicForm schema={defaultFormSchema} objectForm={objectForm} />`, cada cambio en los inputs actualiza automáticamente `objectForm[field.name]` en tiempo real. Además, cada etiqueta `<label>` expone los atributos `data-name` y `data-value` sincronizados con el estado actual del control.
+
+---
+
+## 4. Diccionario del Esquema JSON
 
 A continuación se detalla cada propiedad disponible para estructurar el objeto JSON del formulario.
 
-### 3.1. Propiedades Principales del Formulario (`DynamicFormSchema`)
+### 4.1. Propiedades Principales del Formulario (`DynamicFormSchema`)
 
 | Propiedad | Tipo | Obligatorio | Descripción |
 | :--- | :--- | :--- | :--- |
@@ -72,25 +95,26 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 
 ---
 
-### 3.2. Propiedades de los Campos (`FormFieldSchema`)
+### 4.2. Propiedades de los Campos (`FormFieldSchema`)
 
 | Propiedad | Tipo | Obligatorio | Descripción |
 | :--- | :--- | :--- | :--- |
-| `id` | `string` | Sí | Clave única del campo. Se utiliza como clave en el objeto JSON de salida. |
+| `id` | `string` | Sí | Identificador único del elemento en el DOM. |
 | `order` | `number` (entero) | No | Define la posición y orden visual del campo. Permite reordenamiento en tiempo real. |
-| `name` | `string` | No | Atributo `name` de HTML. Si se omite, toma el valor de `id`. |
+| `name` | `string` | Sí | Nombre del parámetro para el envío POST y clave dinámica dentro de `objectForm`. |
+| `value` | `unknown` | No | Valor inicial del campo sincronizado en `objectForm` y expuesto en la etiqueta. |
 | `type` | `string` | Sí | Tipo de control: `'text'`, `'number'`, `'email'`, `'password'`, `'tel'`, `'url'`, `'textarea'`, `'file'`, `'select'`. |
-| `label` | `string` | Sí | Etiqueta de texto visible sobre el input. |
+| `label` | `string` | Sí | Etiqueta de texto visible sobre el input (incluye `data-name` y `data-value`). |
 | `placeholder`| `string` | No | Texto de ayuda mostrado cuando el campo está vacío. |
 | `helperText` | `string` | No | Texto explicativo secundario que aparece debajo del input. |
-| `defaultValue`| `unknown` | No | Valor con el que se inicializa el campo. |
+| `defaultValue`| `unknown` | No | Valor de respaldo si `value` no está definido. |
 | `disabled` | `boolean` | No | Deshabilita la interacción con el control. |
 | `readOnly` | `boolean` | No | Marca el campo como de solo lectura. |
 | `colSpan` | `1 \| 2 \| 3 \| 4 \| 6 \| 12` | No | Cantidad de columnas que abarca el campo dentro de la cuadrícula. |
 
 ---
 
-### 3.3. Propiedades Específicas por Tipo de Control
+### 4.3. Propiedades Específicas por Tipo de Control
 
 #### Para `type: "select"`
 | Propiedad | Tipo | Descripción |
@@ -116,7 +140,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 
 ---
 
-### 3.4. Objeto de Validaciones (`validation`)
+### 4.4. Objeto de Validaciones (`validation`)
 
 | Propiedad | Tipo | Descripción |
 | :--- | :--- | :--- |
@@ -132,117 +156,106 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 
 ---
 
-## 4. Ejemplo de Implementación en React
+## 5. Ejemplo de Implementación con `defaultFormSchema` y `objectForm`
 
 ```tsx
-import React, { useState } from 'react';
-import { DynamicForm, type DynamicFormSchema, type FormValues } from '@/components/organisms/dynamic-form';
+'use client';
 
-const registroSchema: DynamicFormSchema = {
-  id: 'formulario-registro',
-  title: 'Registro de Solicitud',
-  description: 'Complete los datos solicitados en el formulario.',
-  submitText: 'Enviar Solicitud',
-  resetText: 'Limpiar',
+import { MainTemplate } from '@/components/templates';
+import {
+  DynamicForm,
+  buildFormObject,
+  type DynamicFormSchema,
+  type FormValues,
+} from '@/components/organisms/dynamic-form';
+
+export const defaultFormSchema: DynamicFormSchema = {
+  id: 'main-form',
   layout: {
     columns: 2,
     gap: 'md',
   },
   fields: [
     {
-      id: 'nombre',
+      id: 'input_text',
       order: 1,
       type: 'text',
-      label: 'Nombre Completo',
-      placeholder: 'Ej. María González',
+      label: 'Texto',
+      name: 'texto',
+      value: '',
+      placeholder: 'Ingrese texto...',
       colSpan: 1,
-      validation: {
-        required: 'El nombre es obligatorio.',
-        minLength: 3,
-      },
     },
     {
-      id: 'edad',
+      id: 'input_number',
       order: 2,
       type: 'number',
-      label: 'Edad',
-      placeholder: '30',
+      label: 'Número',
+      name: 'numero',
+      value: 0,
+      placeholder: '0',
       colSpan: 1,
-      validation: {
-        required: true,
-        min: 18,
-        max: 99,
-      },
     },
     {
-      id: 'departamento',
+      id: 'input_select',
       order: 3,
       type: 'select',
-      label: 'Departamento',
-      colSpan: 1,
-      placeholder: 'Seleccione un departamento...',
+      label: 'Selección',
+      name: 'seleccion',
+      value: '',
+      placeholder: 'Seleccione una opción...',
       options: [
-        { label: 'Ingeniería y Software', value: 'engineering' },
-        { label: 'Diseño de Producto', value: 'design' },
-        { label: 'Operaciones', value: 'operations' },
+        { label: 'Opción 1', value: '1' },
+        { label: 'Opción 2', value: '2' },
+        { label: 'Opción 3', value: '3' },
       ],
-      validation: {
-        required: 'Debe seleccionar un departamento.',
-      },
+      colSpan: 1,
     },
     {
-      id: 'documento',
+      id: 'input_file',
       order: 4,
       type: 'file',
-      label: 'Documento de Identidad o Comprobante',
-      helperText: 'Archivos PDF o imágenes (máx. 5 MB).',
-      accept: '.pdf,.png,.jpg',
-      maxSizeMb: 5,
+      label: 'Archivo',
+      name: 'archivo',
+      value: null,
       colSpan: 1,
-      validation: {
-        required: 'Debe adjuntar un archivo válido.',
-        maxSizeMb: 5,
-      },
     },
     {
-      id: 'comentarios',
+      id: 'input_textarea',
       order: 5,
       type: 'textarea',
-      label: 'Comentarios Adicionales',
-      placeholder: 'Detalles u observaciones...',
+      label: 'Descripción',
+      name: 'descripcion',
+      value: '',
+      placeholder: 'Ingrese contenido...',
       rows: 4,
       colSpan: 2,
-      validation: {
-        maxLength: 500,
-      },
     },
   ],
 };
 
-export default function PaginaRegistro() {
-  const [datosFormulario, setDatosFormulario] = useState<FormValues>({});
+export const objectForm: FormValues = buildFormObject(defaultFormSchema);
 
-  const handleSubmit = async (valores: FormValues) => {
-    console.log('Valores procesados:', valores);
-  };
-
+export default function HomePage() {
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <MainTemplate>
       <DynamicForm
-        schema={registroSchema}
-        onChange={setDatosFormulario}
-        onSubmit={handleSubmit}
+        schema={defaultFormSchema}
+        objectForm={objectForm}
+        onSubmit={(values) => {
+          // Tanto `values` como `objectForm` contienen los valores dinámicos
+          // construidos en base a los `name` de defaultFormSchema
+          console.log(objectForm);
+        }}
       />
-    </div>
+    </MainTemplate>
   );
 }
 ```
 
 ---
 
-## 5. Scripts Disponibles
-
-El proyecto utiliza **pnpm** como gestor de paquetes y Node.js 26 LTS:
+## 6. Scripts Disponibles
 
 ```bash
 # Activar version de Node.js mediante .nvmrc

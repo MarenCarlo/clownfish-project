@@ -5,15 +5,18 @@ import { Card } from '@/components/atoms/card';
 import { Button } from '@/components/atoms/button';
 import { Alert } from '@/components/molecules/alert';
 import { DynamicFormField } from '@/components/molecules/dynamic-form-field';
-import type {
-  DynamicFormSchema,
-  FormFieldSchema,
-  FormValues,
-  FormErrors,
+import {
+  buildFormObject,
+  syncObjectForm,
+  defaultFormSchema,
+  type DynamicFormSchema,
+  type FormFieldSchema,
+  type FormValues,
+  type FormErrors,
 } from './types';
 
 export interface DynamicFormProps {
-  schema: DynamicFormSchema;
+  schema?: DynamicFormSchema;
   initialValues?: FormValues;
   onSubmit?: (values: FormValues) => void | Promise<void>;
   onChange?: (values: FormValues) => void;
@@ -23,7 +26,7 @@ export interface DynamicFormProps {
 }
 
 export const DynamicForm: React.FC<DynamicFormProps> = ({
-  schema,
+  schema = defaultFormSchema,
   initialValues = {},
   onSubmit,
   onChange,
@@ -31,14 +34,17 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   className = '',
   showCardWrapper = true,
 }) => {
-  // Inicializacion de valores por defecto desde el esquema
+  const getFieldKey = (field: FormFieldSchema) => field.name || field.id;
+
+  // Inicializacion de valores en base a los names del esquema
   const [values, setValues] = useState<FormValues>(() => {
-    const defaults: FormValues = {};
-    schema.fields.forEach((field) => {
-      defaults[field.id] =
-        initialValues[field.id] ?? field.defaultValue ?? (field.type === 'file' ? null : '');
-    });
-    return defaults;
+    const baseObject = buildFormObject(schema);
+    const merged: FormValues = {
+      ...baseObject,
+      ...initialValues,
+    };
+    syncObjectForm(merged);
+    return merged;
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -138,15 +144,16 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     []
   );
 
-  const handleFieldChange = (fieldId: string, value: unknown) => {
-    const updated = { ...values, [fieldId]: value };
+  const handleFieldChange = (field: FormFieldSchema, value: unknown) => {
+    const key = getFieldKey(field);
+    const updated = { ...values, [key]: value };
     setValues(updated);
+    syncObjectForm(updated);
 
     // Limpiar error del campo si ya cumple
-    const field = schema.fields.find((f) => f.id === fieldId);
-    if (field && errors[fieldId]) {
+    if (errors[key]) {
       const err = validateField(field, value, updated);
-      setErrors((prev) => ({ ...prev, [fieldId]: err }));
+      setErrors((prev) => ({ ...prev, [key]: err }));
     }
 
     if (onChange) {
@@ -154,12 +161,10 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     }
   };
 
-  const handleFieldBlur = (fieldId: string) => {
-    const field = schema.fields.find((f) => f.id === fieldId);
-    if (!field) return;
-
-    const error = validateField(field, values[fieldId], values);
-    setErrors((prev) => ({ ...prev, [fieldId]: error }));
+  const handleFieldBlur = (field: FormFieldSchema) => {
+    const key = getFieldKey(field);
+    const error = validateField(field, values[key], values);
+    setErrors((prev) => ({ ...prev, [key]: error }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,9 +176,10 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     let hasErrors = false;
 
     for (const field of schema.fields) {
-      const error = validateField(field, values[field.id], values);
+      const key = getFieldKey(field);
+      const error = validateField(field, values[key], values);
       if (error) {
-        newErrors[field.id] = error;
+        newErrors[key] = error;
         hasErrors = true;
       }
     }
@@ -184,10 +190,12 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       return;
     }
 
+    const currentObjectForm = syncObjectForm(values);
+
     if (onSubmit) {
       try {
         setIsSubmitting(true);
-        await onSubmit(values);
+        await onSubmit(currentObjectForm);
         setSubmitSuccess('Formulario enviado y procesado con éxito.');
       } catch (err: unknown) {
         const message =
@@ -202,14 +210,14 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   const handleReset = () => {
-    const defaults: FormValues = {};
-    schema.fields.forEach((field) => {
-      defaults[field.id] =
-        initialValues[field.id] ?? field.defaultValue ?? (field.type === 'file' ? null : '');
-    });
+    const defaults = buildFormObject(schema);
     setValues(defaults);
+    syncObjectForm(defaults);
     setErrors({});
     setSubmitSuccess(null);
+    if (onChange) {
+      onChange(defaults);
+    }
   };
 
   const getColSpanClass = (colSpan?: number) => {
@@ -273,18 +281,21 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
       {/* Cuadricula dinamica ordenada por 'order' */}
       <div className={`grid gap-5 ${getGridColsClass()}`}>
-        {sortedFields.map((field) => (
-          <div key={field.id} className={getColSpanClass(field.colSpan)}>
-            <DynamicFormField
-              field={field}
-              value={values[field.id]}
-              error={errors[field.id]}
-              disabled={disabled || isSubmitting}
-              onChange={(newVal) => handleFieldChange(field.id, newVal)}
-              onBlur={() => handleFieldBlur(field.id)}
-            />
-          </div>
-        ))}
+        {sortedFields.map((field) => {
+          const key = getFieldKey(field);
+          return (
+            <div key={field.id} className={getColSpanClass(field.colSpan)}>
+              <DynamicFormField
+                field={field}
+                value={values[key]}
+                error={errors[key]}
+                disabled={disabled || isSubmitting}
+                onChange={(newVal) => handleFieldChange(field, newVal)}
+                onBlur={() => handleFieldBlur(field)}
+              />
+            </div>
+          );
+        })}
       </div>
 
       {/* Barra de Acciones */}
