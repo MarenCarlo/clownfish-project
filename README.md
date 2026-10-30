@@ -12,8 +12,9 @@ El componente `DynamicForm` permite generar formularios completos y reactivos a 
 
 ### Tipos de Inputs Soportados
 
-1. **Input 1: Text / Number**
+1. **Input 1: Text / Number / Password**
    * Tipos: `text`, `number`, `email`, `password`, `tel`, `url`.
+   * El tipo `password` incluye botón de alternancia (mostrar/ocultar contraseña) con icono SVG y `autocomplete="current-password"`.
    * Permite definir restricciones de longitud, pasos numéricos (`step`), rangos mínimos y máximos (`min`, `max`) y patrones de validación (`pattern`).
 2. **Input 2: Textarea**
    * Tipo: `textarea`.
@@ -107,6 +108,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | `label` | `string` | Sí | Etiqueta de texto visible sobre el input (incluye `data-name` y `data-value`). |
 | `placeholder`| `string` | No | Texto de ayuda mostrado cuando el campo está vacío. |
 | `helperText` | `string` | No | Texto explicativo secundario que aparece debajo del input. |
+| `autoComplete` | `string` | No | Valor de autocompletado HTML (ej. `'username'`, `'current-password'`). |
 | `defaultValue`| `unknown` | No | Valor de respaldo si `value` no está definido. |
 | `disabled` | `boolean` | No | Deshabilita la interacción con el control. |
 | `readOnly` | `boolean` | No | Marca el campo como de solo lectura. |

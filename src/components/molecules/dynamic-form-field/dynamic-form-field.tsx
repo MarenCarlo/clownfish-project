@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import { Input } from '@/components/atoms/input';
 import { Textarea } from '@/components/atoms/textarea';
 import { Select } from '@/components/atoms/select';
@@ -22,11 +24,19 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   onChange,
   onBlur,
 }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const isRequired = Boolean(field.validation?.required);
   const isDisabled = disabled || field.disabled;
   const isError = Boolean(error);
   const fieldId = field.id;
   const fieldName = field.name || field.id;
+
+  const isIdentifierField =
+    field.type === 'email' ||
+    field.type === 'url' ||
+    field.type === 'password' ||
+    field.autoComplete === 'username';
 
   const serializedLabelValue =
     value instanceof File
@@ -39,9 +49,76 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
 
   const renderControl = () => {
     switch (field.type) {
+      case 'password':
+        return (
+          <div className="relative w-full">
+            <Input
+              id={fieldId}
+              name={fieldName}
+              type={showPassword ? 'text' : 'password'}
+              placeholder={field.placeholder}
+              value={typeof value === 'string' || typeof value === 'number' ? value : ''}
+              autoComplete={field.autoComplete ?? 'current-password'}
+              spellCheck={false}
+              autoCorrect="off"
+              autoCapitalize="off"
+              required={isRequired}
+              disabled={isDisabled}
+              readOnly={field.readOnly}
+              isError={isError}
+              className="pr-10"
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              disabled={isDisabled}
+              aria-pressed={showPassword}
+              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-black hover:opacity-70 disabled:opacity-40 cursor-pointer"
+            >
+              {showPassword ? (
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        );
+
       case 'text':
       case 'email':
-      case 'password':
       case 'tel':
       case 'url':
         return (
@@ -51,6 +128,11 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             type={field.type}
             placeholder={field.placeholder}
             value={typeof value === 'string' || typeof value === 'number' ? value : ''}
+            autoComplete={field.autoComplete}
+            spellCheck={isIdentifierField ? false : undefined}
+            autoCorrect={isIdentifierField ? 'off' : undefined}
+            autoCapitalize={isIdentifierField ? 'off' : undefined}
+            required={isRequired}
             disabled={isDisabled}
             readOnly={field.readOnly}
             isError={isError}
@@ -70,6 +152,8 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             max={field.validation?.max}
             placeholder={field.placeholder}
             value={value !== undefined && value !== null ? String(value) : ''}
+            autoComplete={field.autoComplete}
+            required={isRequired}
             disabled={isDisabled}
             readOnly={field.readOnly}
             isError={isError}
@@ -89,6 +173,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             rows={field.rows ?? 4}
             placeholder={field.placeholder}
             value={typeof value === 'string' ? value : ''}
+            required={isRequired}
             disabled={isDisabled}
             readOnly={field.readOnly}
             isError={isError}
@@ -105,6 +190,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             options={field.options}
             placeholder={field.placeholder ?? 'Selecciona una opción...'}
             value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
+            required={isRequired}
             disabled={isDisabled}
             isError={isError}
             onChange={(e) => onChange(e.target.value)}

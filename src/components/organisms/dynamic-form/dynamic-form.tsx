@@ -43,7 +43,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       ...baseObject,
       ...initialValues,
     };
-    syncObjectForm(merged);
+    syncObjectForm(merged, schema.id);
     return merged;
   });
 
@@ -124,8 +124,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         const files: File[] = Array.isArray(val)
           ? (val as File[])
           : val instanceof File
-          ? [val]
-          : [];
+            ? [val]
+            : [];
 
         for (const f of files) {
           if (f.size > limitBytes) {
@@ -148,7 +148,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     const key = getFieldKey(field);
     const updated = { ...values, [key]: value };
     setValues(updated);
-    syncObjectForm(updated);
+    syncObjectForm(updated, schema.id);
 
     // Limpiar error del campo si ya cumple
     if (errors[key]) {
@@ -190,7 +190,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       return;
     }
 
-    const currentObjectForm = syncObjectForm(values);
+    const currentObjectForm = syncObjectForm(values, schema.id);
 
     if (onSubmit) {
       try {
@@ -212,7 +212,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   const handleReset = () => {
     const defaults = buildFormObject(schema);
     setValues(defaults);
-    syncObjectForm(defaults);
+    syncObjectForm(defaults, schema.id);
     setErrors({});
     setSubmitSuccess(null);
     if (onChange) {

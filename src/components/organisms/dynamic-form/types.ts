@@ -36,6 +36,7 @@ export interface FormFieldSchema {
   placeholder?: string;
   helperText?: string;
   defaultValue?: unknown;
+  autoComplete?: string;
   disabled?: boolean;
   readOnly?: boolean;
   validation?: FieldValidation;
@@ -117,8 +118,19 @@ export const defaultFormSchema: DynamicFormSchema = {
       colSpan: 1,
     },
     {
-      id: 'input_select',
+      id: 'input_password',
       order: 3,
+      type: 'password',
+      label: 'Contraseña',
+      name: 'password',
+      value: '',
+      placeholder: 'Ingrese contraseña...',
+      autoComplete: 'current-password',
+      colSpan: 1,
+    },
+    {
+      id: 'input_select',
+      order: 4,
       type: 'select',
       label: 'Selección',
       name: 'seleccion',
@@ -133,16 +145,16 @@ export const defaultFormSchema: DynamicFormSchema = {
     },
     {
       id: 'input_file',
-      order: 4,
+      order: 5,
       type: 'file',
       label: 'Archivo',
       name: 'archivo',
       value: null,
-      colSpan: 1,
+      colSpan: 2,
     },
     {
       id: 'input_textarea',
-      order: 5,
+      order: 6,
       type: 'textarea',
       label: 'Descripción',
       name: 'descripcion',
@@ -155,15 +167,61 @@ export const defaultFormSchema: DynamicFormSchema = {
 };
 
 /**
+ * Esquema JSON para el formulario de Login (sin registro, ni olvidar contraseña, ni recordarme).
+ */
+export const loginFormSchema: DynamicFormSchema = {
+  id: 'login-form',
+  title: 'Iniciar Sesión',
+  submitText: 'Iniciar Sesión',
+  layout: {
+    columns: 1,
+    gap: 'md',
+  },
+  fields: [
+    {
+      id: 'login_email',
+      order: 1,
+      type: 'email',
+      label: 'Correo Electrónico',
+      name: 'email',
+      value: '',
+      placeholder: 'correo@ejemplo.com',
+      autoComplete: 'username',
+      colSpan: 1,
+    },
+    {
+      id: 'login_password',
+      order: 2,
+      type: 'password',
+      label: 'Contraseña',
+      name: 'password',
+      value: '',
+      placeholder: 'Ingrese su contraseña',
+      autoComplete: 'current-password',
+      colSpan: 1,
+    },
+  ],
+};
+
+/**
  * Objeto secundario que almacena los valores dinámicos del formulario
  * construidos a partir de los `name` de `defaultFormSchema`.
  */
 export const objectForm: FormValues = buildFormObject(defaultFormSchema);
 
-export function syncObjectForm(values: FormValues): FormValues {
-  Object.keys(objectForm).forEach((key) => {
-    delete objectForm[key];
+/**
+ * Objeto secundario que almacena los valores dinámicos del formulario de Login.
+ */
+export const loginObjectForm: FormValues = buildFormObject(loginFormSchema);
+
+export function syncObjectForm(
+  values: FormValues,
+  schemaId?: string
+): FormValues {
+  const target = schemaId === 'login-form' ? loginObjectForm : objectForm;
+  Object.keys(target).forEach((key) => {
+    delete target[key];
   });
-  Object.assign(objectForm, values);
-  return objectForm;
+  Object.assign(target, values);
+  return target;
 }
