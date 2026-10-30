@@ -90,81 +90,128 @@ export function buildFormObject(schema: DynamicFormSchema): FormValues {
   }, {});
 }
 
-export const defaultFormSchema: DynamicFormSchema = {
-  id: 'main-form',
+/**
+ * Esquema JSON para captura de datos de productos de la competencia
+ * (Nombre, Código de Barras, Precio, Gramaje, Unidad, Foto y Observaciones).
+ */
+export const productFormSchema: DynamicFormSchema = {
+  id: 'product-form',
+  title: 'Registro de Producto (Competencia)',
+  description: 'Captura de precios, gramaje, código de barras y fotografía del producto.',
+  submitText: 'Guardar Producto',
+  resetText: 'Limpiar',
   layout: {
     columns: 2,
     gap: 'md',
   },
   fields: [
     {
-      id: 'input_text',
+      id: 'product_name',
       order: 1,
       type: 'text',
-      label: 'Texto',
-      name: 'texto',
+      label: 'Nombre del Producto',
+      name: 'nombre',
       value: '',
-      placeholder: 'Ingrese texto...',
+      placeholder: 'Ej. Café Soluble Clásico',
       colSpan: 1,
+      validation: {
+        required: 'El nombre del producto es obligatorio.',
+      },
     },
     {
-      id: 'input_number',
+      id: 'product_barcode',
       order: 2,
-      type: 'number',
-      label: 'Número',
-      name: 'numero',
-      value: 0,
-      placeholder: '0',
+      type: 'text',
+      label: 'Código de Barras',
+      name: 'barras',
+      value: '',
+      placeholder: 'Ej. 7501058612345',
       colSpan: 1,
+      validation: {
+        required: 'El código de barras es obligatorio.',
+      },
     },
     {
-      id: 'input_password',
+      id: 'product_price',
       order: 3,
-      type: 'password',
-      label: 'Contraseña',
-      name: 'password',
+      type: 'number',
+      label: 'Precio',
+      name: 'precio',
       value: '',
-      placeholder: 'Ingrese contraseña...',
-      autoComplete: 'current-password',
+      step: '0.01',
+      placeholder: '0.00',
       colSpan: 1,
+      validation: {
+        required: 'El precio es obligatorio.',
+        min: 0,
+      },
     },
     {
-      id: 'input_select',
+      id: 'product_weight',
       order: 4,
-      type: 'select',
-      label: 'Selección',
-      name: 'seleccion',
+      type: 'number',
+      label: 'Gramaje',
+      name: 'gramaje',
       value: '',
-      placeholder: 'Seleccione una opción...',
-      options: [
-        { label: 'Opción 1', value: '1' },
-        { label: 'Opción 2', value: '2' },
-        { label: 'Opción 3', value: '3' },
-      ],
+      step: 'any',
+      placeholder: 'Ej. 200',
       colSpan: 1,
+      validation: {
+        required: 'El gramaje es obligatorio.',
+        min: 0,
+      },
     },
     {
-      id: 'input_file',
+      id: 'product_unit',
       order: 5,
-      type: 'file',
-      label: 'Archivo',
-      name: 'archivo',
-      value: null,
+      type: 'select',
+      label: 'Unidad de Gramaje',
+      name: 'unidad_gramaje',
+      value: 'g',
+      placeholder: 'Seleccione unidad...',
+      options: [
+        { label: 'Gramos (g)', value: 'g' },
+        { label: 'Kilogramos (kg)', value: 'kg' },
+        { label: 'Mililitros (ml)', value: 'ml' },
+        { label: 'Litros (L)', value: 'l' },
+        { label: 'Pieza (pz)', value: 'pz' },
+      ],
       colSpan: 2,
+      validation: {
+        required: 'Seleccione una unidad de medida.',
+      },
     },
     {
-      id: 'input_textarea',
+      id: 'product_photo',
       order: 6,
+      type: 'file',
+      label: 'Fotografía del Producto',
+      name: 'foto',
+      value: null,
+      accept: 'image/*',
+      maxSizeMb: 10,
+      helperText: 'Subir foto del producto o etiqueta de precio en anaquel (JPG, PNG, WEBP).',
+      colSpan: 2,
+      validation: {
+        required: 'La fotografía del producto es obligatoria.',
+        maxSizeMb: 10,
+      },
+    },
+    {
+      id: 'product_notes',
+      order: 7,
       type: 'textarea',
-      label: 'Descripción',
-      name: 'descripcion',
+      label: 'Observaciones',
+      name: 'observaciones',
       value: '',
-      placeholder: 'Ingrese contenido...',
-      rows: 4,
+      placeholder: 'Tienda competidora, ubicación o notas sobre el precio...',
+      rows: 3,
       colSpan: 2,
     },
   ],
 };
+
+export const defaultFormSchema: DynamicFormSchema = productFormSchema;
 
 /**
  * Esquema JSON para el formulario de Login (sin registro, ni olvidar contraseña, ni recordarme).
@@ -204,10 +251,12 @@ export const loginFormSchema: DynamicFormSchema = {
 };
 
 /**
- * Objeto secundario que almacena los valores dinámicos del formulario
- * construidos a partir de los `name` de `defaultFormSchema`.
+ * Objeto secundario que almacena los valores dinámicos del formulario de productos
+ * construidos a partir de los `name` de `productFormSchema`.
  */
-export const objectForm: FormValues = buildFormObject(defaultFormSchema);
+export const productObjectForm: FormValues = buildFormObject(productFormSchema);
+
+export const objectForm: FormValues = productObjectForm;
 
 /**
  * Objeto secundario que almacena los valores dinámicos del formulario de Login.
@@ -218,7 +267,7 @@ export function syncObjectForm(
   values: FormValues,
   schemaId?: string
 ): FormValues {
-  const target = schemaId === 'login-form' ? loginObjectForm : objectForm;
+  const target = schemaId === 'login-form' ? loginObjectForm : productObjectForm;
   Object.keys(target).forEach((key) => {
     delete target[key];
   });

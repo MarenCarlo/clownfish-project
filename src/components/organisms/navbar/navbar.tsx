@@ -31,6 +31,15 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
             </span>
           </Link>
         </div>
+
+        <nav className="flex items-center gap-6 text-sm font-medium text-black">
+          <Link href="/" className="hover:underline">
+            Login
+          </Link>
+          <Link href="/productos" className="hover:underline">
+            Productos
+          </Link>
+        </nav>
       </div>
     </header>
   );
