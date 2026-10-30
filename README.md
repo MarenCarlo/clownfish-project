@@ -139,6 +139,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | Propiedad | Tipo | Descripción |
 | :--- | :--- | :--- |
 | `rows` | `number` | Altura fija en número de filas visibles (redimensionamiento manual deshabilitado con `resize-none`). |
+| `maxLength` | `number` | Límite máximo de caracteres permitidos. Muestra un contador en tiempo real (`actual/máximo`) en la esquina inferior derecha dentro del `Textarea`. |
 
 ---
 

@@ -64,10 +64,11 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   const validateField = useCallback(
     (field: FormFieldSchema, val: unknown, allValues: FormValues): string | undefined => {
       const v = field.validation;
-      if (!v) return undefined;
+      const effectiveMaxLength = field.maxLength ?? v?.maxLength;
+      if (!v && effectiveMaxLength === undefined) return undefined;
 
       // Validacion de Requerido
-      if (v.required) {
+      if (v?.required) {
         const reqMessage =
           typeof v.required === 'string'
             ? v.required
@@ -92,23 +93,23 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         if (isNaN(numVal)) {
           return 'Debe ser un número válido.';
         }
-        if (v.min !== undefined && numVal < v.min) {
+        if (v?.min !== undefined && numVal < v.min) {
           return `El valor mínimo permitido es ${v.min}.`;
         }
-        if (v.max !== undefined && numVal > v.max) {
+        if (v?.max !== undefined && numVal > v.max) {
           return `El valor máximo permitido es ${v.max}.`;
         }
       }
 
       // Validaciones de longitud para texto / textarea
       if (typeof val === 'string') {
-        if (v.minLength !== undefined && val.length < v.minLength) {
+        if (v?.minLength !== undefined && val.length < v.minLength) {
           return `Debe contener al menos ${v.minLength} caracteres.`;
         }
-        if (v.maxLength !== undefined && val.length > v.maxLength) {
-          return `No puede superar los ${v.maxLength} caracteres.`;
+        if (effectiveMaxLength !== undefined && val.length > effectiveMaxLength) {
+          return `No puede superar los ${effectiveMaxLength} caracteres.`;
         }
-        if (v.pattern) {
+        if (v?.pattern) {
           const regex =
             typeof v.pattern === 'string' ? new RegExp(v.pattern) : v.pattern;
           if (!regex.test(val)) {
@@ -118,8 +119,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       }
 
       // Validacion de tamano para archivo
-      if (field.type === 'file' && (v.maxSizeMb || field.maxSizeMb)) {
-        const limitMb = v.maxSizeMb ?? field.maxSizeMb!;
+      if (field.type === 'file' && (v?.maxSizeMb || field.maxSizeMb)) {
+        const limitMb = v?.maxSizeMb ?? field.maxSizeMb!;
         const limitBytes = limitMb * 1024 * 1024;
         const files: File[] = Array.isArray(val)
           ? (val as File[])
@@ -135,7 +136,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       }
 
       // Validador personalizado
-      if (v.customValidator) {
+      if (v?.customValidator) {
         return v.customValidator(val, allValues);
       }
 

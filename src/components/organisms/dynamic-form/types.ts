@@ -52,8 +52,9 @@ export interface FormFieldSchema {
   // Especifico para number
   step?: number | string;
 
-  // Especifico para textarea
+  // Especifico para textarea / text
   rows?: number;
+  maxLength?: number;
 
   // Espacio de columnas en grid (1 a 12)
   colSpan?: 1 | 2 | 3 | 4 | 6 | 12;
@@ -206,6 +207,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       placeholder: 'Tienda competidora, ubicación o notas sobre el precio...',
       rows: 3,
+      maxLength: 250,
       colSpan: 2,
     },
   ],

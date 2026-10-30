@@ -31,6 +31,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   const isError = Boolean(error);
   const fieldId = field.id;
   const fieldName = field.name || field.id;
+  const maxLength = field.maxLength ?? field.validation?.maxLength;
 
   const isIdentifierField =
     field.type === 'email' ||
@@ -126,6 +127,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             id={fieldId}
             name={fieldName}
             type={field.type}
+            maxLength={maxLength}
             placeholder={field.placeholder}
             value={typeof value === 'string' || typeof value === 'number' ? value : ''}
             autoComplete={field.autoComplete}
@@ -136,7 +138,13 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             disabled={isDisabled}
             readOnly={field.readOnly}
             isError={isError}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              const nextVal =
+                maxLength !== undefined
+                  ? e.target.value.slice(0, maxLength)
+                  : e.target.value;
+              onChange(nextVal);
+            }}
             onBlur={onBlur}
           />
         );
@@ -171,13 +179,20 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             id={fieldId}
             name={fieldName}
             rows={field.rows ?? 4}
+            maxLength={maxLength}
             placeholder={field.placeholder}
             value={typeof value === 'string' ? value : ''}
             required={isRequired}
             disabled={isDisabled}
             readOnly={field.readOnly}
             isError={isError}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              const nextVal =
+                maxLength !== undefined
+                  ? e.target.value.slice(0, maxLength)
+                  : e.target.value;
+              onChange(nextVal);
+            }}
             onBlur={onBlur}
           />
         );
