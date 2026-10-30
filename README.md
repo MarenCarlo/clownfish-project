@@ -138,7 +138,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 #### Para `type: "textarea"`
 | Propiedad | Tipo | Descripción |
 | :--- | :--- | :--- |
-| `rows` | `number` | Número de líneas visibles por defecto. |
+| `rows` | `number` | Altura fija en número de filas visibles (redimensionamiento manual deshabilitado con `resize-none`). |
 
 ---
 
