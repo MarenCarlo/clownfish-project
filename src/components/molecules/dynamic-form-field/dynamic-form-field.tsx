@@ -43,10 +43,10 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
     value instanceof File
       ? value.name
       : Array.isArray(value)
-      ? value.map((item) => (item instanceof File ? item.name : String(item))).join(',')
-      : value !== undefined && value !== null
-      ? String(value)
-      : '';
+        ? value.map((item) => (item instanceof File ? item.name : String(item))).join(',')
+        : value !== undefined && value !== null
+          ? String(value)
+          : '';
 
   const renderControl = () => {
     switch (field.type) {

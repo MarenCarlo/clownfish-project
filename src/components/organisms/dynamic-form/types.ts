@@ -57,7 +57,7 @@ export interface FormFieldSchema {
   maxLength?: number;
 
   // Espacio de columnas en grid (1 a 12)
-  colSpan?: 1 | 2 | 3 | 4 | 6 | 12;
+  colSpan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 }
 
 export interface DynamicFormSchema {
@@ -67,7 +67,7 @@ export interface DynamicFormSchema {
   submitText?: string;
   resetText?: string;
   layout?: {
-    columns?: 1 | 2 | 3 | 4;
+    columns?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     gap?: 'sm' | 'md' | 'lg';
   };
   fields: FormFieldSchema[];
@@ -102,7 +102,7 @@ export const productFormSchema: DynamicFormSchema = {
   submitText: 'Guardar Producto',
   resetText: 'Limpiar',
   layout: {
-    columns: 2,
+    columns: 12,
     gap: 'md',
   },
   fields: [
@@ -114,7 +114,7 @@ export const productFormSchema: DynamicFormSchema = {
       name: 'nombre',
       value: '',
       placeholder: 'Ej. Café Soluble Clásico',
-      colSpan: 2,
+      colSpan: 6,
       validation: {
         required: 'El nombre del producto es obligatorio.',
       },
@@ -127,7 +127,7 @@ export const productFormSchema: DynamicFormSchema = {
       name: 'barras',
       value: '',
       placeholder: 'Ej. 7501058612345',
-      colSpan: 1,
+      colSpan: 6,
       validation: {
         required: 'El código de barras es obligatorio.',
       },
@@ -141,7 +141,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       step: '0.01',
       placeholder: '0.00',
-      colSpan: 2,
+      colSpan: 4,
       validation: {
         required: 'El precio es obligatorio.',
         min: 0,
@@ -156,7 +156,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       step: 'any',
       placeholder: 'Ej. 200',
-      colSpan: 1,
+      colSpan: 4,
       validation: {
         required: 'El gramaje es obligatorio.',
         min: 0,
@@ -177,30 +177,14 @@ export const productFormSchema: DynamicFormSchema = {
         { label: 'Litros (L)', value: 'l' },
         { label: 'Pieza (pz)', value: 'pz' },
       ],
-      colSpan: 2,
+      colSpan: 4,
       validation: {
         required: 'Seleccione una unidad de medida.',
       },
     },
     {
-      id: 'product_photo',
-      order: 6,
-      type: 'file',
-      label: 'Fotografía del Producto',
-      name: 'foto',
-      value: null,
-      accept: 'image/*',
-      maxSizeMb: 10,
-      helperText: 'Subir foto del producto o etiqueta de precio en anaquel (JPG, PNG, WEBP).',
-      colSpan: 2,
-      validation: {
-        required: 'La fotografía del producto es obligatoria.',
-        maxSizeMb: 10,
-      },
-    },
-    {
       id: 'product_notes',
-      order: 7,
+      order: 6,
       type: 'textarea',
       label: 'Observaciones',
       name: 'observaciones',
@@ -208,7 +192,23 @@ export const productFormSchema: DynamicFormSchema = {
       placeholder: 'Tienda competidora, ubicación o notas sobre el precio...',
       rows: 3,
       maxLength: 250,
-      colSpan: 2,
+      colSpan: 12,
+    },
+    {
+      id: 'product_photo',
+      order: 7,
+      type: 'file',
+      label: 'Fotografía del Producto',
+      name: 'foto',
+      value: null,
+      accept: 'image/*',
+      maxSizeMb: 10,
+      helperText: 'Subir foto del producto o etiqueta de precio en anaquel (JPG, PNG, WEBP).',
+      colSpan: 12,
+      validation: {
+        required: 'La fotografía del producto es obligatoria.',
+        maxSizeMb: 10,
+      },
     },
   ],
 };

@@ -90,7 +90,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | `submitText` | `string` | No | Texto del botón de envío. Por defecto: "Guardar Formulario". |
 | `resetText` | `string` | No | Si se define, muestra un botón secundario para limpiar el formulario. |
 | `layout` | `object` | No | Configuración de distribución de columnas del formulario. |
-| `layout.columns` | `1 \| 2 \| 3 \| 4` | No | Cantidad de columnas base en pantallas medianas y grandes. Por defecto: `1`. |
+| `layout.columns` | `1..12` | No | Cantidad total de columnas del lienzo (estilo Bootstrap) en pantallas medianas y grandes (`sm+`). En móviles se apila automáticamente en 1 columna. Por defecto: `12`. |
 | `layout.gap` | `'sm' \| 'md' \| 'lg'` | No | Espaciado entre elementos del formulario. |
 | `fields` | `FormFieldSchema[]` | Sí | Array con la definición de cada campo del formulario. |
 
@@ -112,7 +112,7 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | `defaultValue`| `unknown` | No | Valor de respaldo si `value` no está definido. |
 | `disabled` | `boolean` | No | Deshabilita la interacción con el control. |
 | `readOnly` | `boolean` | No | Marca el campo como de solo lectura. |
-| `colSpan` | `1 \| 2 \| 3 \| 4 \| 6 \| 12` | No | Cantidad de columnas que abarca el campo dentro de la cuadrícula. |
+| `colSpan` | `1..12` | No | Cantidad de columnas que ocupa el elemento dentro del lienzo `layout.columns` (ej. con `columns: 12`, permite combinaciones como `6` y `6`, `8` y `4`, `10` y `2`, o `4`, `4` y `4`). En pantallas móviles ocupa automáticamente el 100% del ancho (`col-span-1`). |
 
 ---
 

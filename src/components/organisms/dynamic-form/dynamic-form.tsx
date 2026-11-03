@@ -221,34 +221,60 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     }
   };
 
+  const totalColumns = schema.layout?.columns ?? 12;
+
   const getColSpanClass = (colSpan?: number) => {
-    switch (colSpan) {
-      case 2:
-        return 'sm:col-span-2';
-      case 3:
-        return 'sm:col-span-3';
-      case 4:
-        return 'sm:col-span-4';
-      case 6:
-        return 'sm:col-span-6';
-      case 12:
-        return 'col-span-full';
-      default:
-        return 'col-span-1';
-    }
+    const rawSpan = colSpan ?? totalColumns;
+    const clampedSpan = Math.min(Math.max(rawSpan, 1), totalColumns);
+
+    const colSpanMap: Record<number, string> = {
+      1: 'col-span-1 sm:col-span-1',
+      2: 'col-span-1 sm:col-span-2',
+      3: 'col-span-1 sm:col-span-3',
+      4: 'col-span-1 sm:col-span-4',
+      5: 'col-span-1 sm:col-span-5',
+      6: 'col-span-1 sm:col-span-6',
+      7: 'col-span-1 sm:col-span-7',
+      8: 'col-span-1 sm:col-span-8',
+      9: 'col-span-1 sm:col-span-9',
+      10: 'col-span-1 sm:col-span-10',
+      11: 'col-span-1 sm:col-span-11',
+      12: 'col-span-1 sm:col-span-12',
+    };
+
+    return colSpanMap[clampedSpan] ?? 'col-span-1 sm:col-span-12';
   };
 
   const getGridColsClass = () => {
-    const cols = schema.layout?.columns ?? 1;
-    switch (cols) {
-      case 2:
-        return 'grid-cols-1 sm:grid-cols-2';
-      case 3:
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
-      case 4:
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
+    const clampedCols = Math.min(Math.max(totalColumns, 1), 12);
+
+    const gridColsMap: Record<number, string> = {
+      1: 'grid-cols-1',
+      2: 'grid-cols-1 sm:grid-cols-2',
+      3: 'grid-cols-1 sm:grid-cols-3',
+      4: 'grid-cols-1 sm:grid-cols-4',
+      5: 'grid-cols-1 sm:grid-cols-5',
+      6: 'grid-cols-1 sm:grid-cols-6',
+      7: 'grid-cols-1 sm:grid-cols-7',
+      8: 'grid-cols-1 sm:grid-cols-8',
+      9: 'grid-cols-1 sm:grid-cols-9',
+      10: 'grid-cols-1 sm:grid-cols-10',
+      11: 'grid-cols-1 sm:grid-cols-11',
+      12: 'grid-cols-1 sm:grid-cols-12',
+    };
+
+    return gridColsMap[clampedCols] ?? 'grid-cols-1 sm:grid-cols-12';
+  };
+
+  const getGridGapClass = () => {
+    const gap = schema.layout?.gap ?? 'md';
+    switch (gap) {
+      case 'sm':
+        return 'gap-3';
+      case 'lg':
+        return 'gap-8';
       default:
-        return 'grid-cols-1';
+        return 'gap-5';
     }
   };
 
@@ -281,7 +307,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       )}
 
       {/* Cuadricula dinamica ordenada por 'order' */}
-      <div className={`grid gap-5 ${getGridColsClass()}`}>
+      <div className={`grid ${getGridGapClass()} ${getGridColsClass()}`}>
         {sortedFields.map((field) => {
           const key = getFieldKey(field);
           return (
