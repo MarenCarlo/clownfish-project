@@ -7,17 +7,6 @@
   --status-success: #052110;
   --status-warning: #261403;
   --status-error: #2b0606;
-
-  /* Variables de React Toastify alineadas al diseño B&W minimalista */
-  --toastify-color-light: #ffffff;
-  --toastify-color-dark: #000000;
-  --toastify-color-info: var(--status-info);
-  --toastify-color-success: var(--status-success);
-  --toastify-color-warning: var(--status-warning);
-  --toastify-color-error: var(--status-error);
-  --toastify-text-color-light: #000000;
-  --toastify-font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  --toastify-toast-bd-radius: 15px;
 }
 
 @theme inline {
@@ -37,47 +26,38 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
-/* Estilizado personalizado de notificaciones Toast */
+/* Estilizado personalizado de notificaciones Toast (Cuadro negro, icono y texto blancos) */
 .Toastify__toast.clownfish-toast {
-  background-color: #ffffff;
-  color: #000000;
-  border: 1px solid #000000;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 14px 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  line-height: 1.4;
-  min-height: 56px;
-  overflow: hidden;
-}
-
-.Toastify__toast.clownfish-toast.Toastify__toast--success {
-  border-color: var(--status-success);
-}
-
-.Toastify__toast.clownfish-toast.Toastify__toast--error {
-  border-color: var(--status-error);
-}
-
-.Toastify__toast.clownfish-toast.Toastify__toast--warning {
-  border-color: var(--status-warning);
-}
-
-.Toastify__toast.clownfish-toast.Toastify__toast--info {
-  border-color: var(--status-info);
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+  border-radius: 15px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2) !important;
+  padding: 14px 16px !important;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  min-height: 56px !important;
+  overflow: hidden !important;
 }
 
 .Toastify__close-button {
-  color: #000000;
-  opacity: 0.6;
-  align-self: center;
+  color: #ffffff !important;
+  opacity: 0.7 !important;
+  align-self: center !important;
 }
 
 .Toastify__close-button:hover {
-  opacity: 1;
+  opacity: 1 !important;
+}
+
+.Toastify__progress-bar--bg {
+  background: rgba(255, 255, 255, 0.2) !important;
+  height: 3px !important;
 }
 
 .Toastify__progress-bar.clownfish-toast-progress {
-  height: 3px;
+  background: #ffffff !important;
+  height: 3px !important;
 }

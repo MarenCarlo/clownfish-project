@@ -8,7 +8,7 @@ function renderToastIcon({ type }: IconProps) {
   switch (type) {
     case 'success':
       return (
-        <div className="w-6 h-6 rounded-full border border-status-success bg-status-success text-white flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
           <svg
             className="w-3.5 h-3.5"
             fill="none"
@@ -26,7 +26,7 @@ function renderToastIcon({ type }: IconProps) {
       );
     case 'error':
       return (
-        <div className="w-6 h-6 rounded-full border border-status-error bg-status-error text-white flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
           <svg
             className="w-3.5 h-3.5"
             fill="none"
@@ -44,7 +44,7 @@ function renderToastIcon({ type }: IconProps) {
       );
     case 'warning':
       return (
-        <div className="w-6 h-6 rounded-full border border-status-warning bg-status-warning text-white flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
           <svg
             className="w-3.5 h-3.5"
             fill="none"
@@ -62,7 +62,7 @@ function renderToastIcon({ type }: IconProps) {
       );
     default:
       return (
-        <div className="w-6 h-6 rounded-full border border-status-info bg-status-info text-white flex items-center justify-center shrink-0">
+        <div className="w-6 h-6 rounded-full bg-white text-black flex items-center justify-center shrink-0">
           <svg
             className="w-3.5 h-3.5"
             fill="none"
@@ -93,7 +93,7 @@ export function ToastProvider() {
       pauseOnFocusLoss
       draggable
       pauseOnHover
-      theme="light"
+      theme="dark"
       transition={Bounce}
       icon={renderToastIcon}
       toastClassName="clownfish-toast"
