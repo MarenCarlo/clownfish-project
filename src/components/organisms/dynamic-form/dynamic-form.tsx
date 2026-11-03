@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { toast } from 'react-toastify';
 import { Card } from '@/components/atoms/card';
 import { Button } from '@/components/atoms/button';
-import { Alert } from '@/components/molecules/alert';
 import { DynamicFormField } from '@/components/molecules/dynamic-form-field';
 import {
   buildFormObject,
@@ -49,7 +49,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   // Ordenamiento reactivo por la propiedad 'order' (entero)
   const sortedFields = useMemo(() => {
@@ -170,7 +169,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitSuccess(null);
 
     // Validar todos los campos
     const newErrors: FormErrors = {};
@@ -197,13 +195,13 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       try {
         setIsSubmitting(true);
         await onSubmit(currentObjectForm);
-        setSubmitSuccess('Formulario enviado y procesado con éxito.');
+        toast.success('Formulario enviado y procesado con éxito.');
       } catch (err: unknown) {
         const message =
           err instanceof Error
             ? err.message
             : 'Ocurrió un error inesperado al procesar el formulario.';
-        setErrors((prev) => ({ ...prev, _form: message }));
+        toast.error(message);
       } finally {
         setIsSubmitting(false);
       }
@@ -215,7 +213,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     setValues(defaults);
     syncObjectForm(defaults, schema.id);
     setErrors({});
-    setSubmitSuccess(null);
     if (onChange) {
       onChange(defaults);
     }
@@ -294,16 +291,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             </p>
           )}
         </div>
-      )}
-
-      {/* Alerta de Error global del formulario */}
-      {errors._form && (
-        <Alert variant="error" title="Error en el formulario" description={errors._form} />
-      )}
-
-      {/* Alerta de Exito */}
-      {submitSuccess && (
-        <Alert variant="success" title="Completado" description={submitSuccess} />
       )}
 
       {/* Cuadricula dinamica ordenada por 'order' */}

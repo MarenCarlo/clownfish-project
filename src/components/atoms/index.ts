@@ -3,3 +3,4 @@ export * from './dynamic-forms';
 export * from './badge';
 export * from './card';
 export * from './spinner';
+export * from './toast-provider';

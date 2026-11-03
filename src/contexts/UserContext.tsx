@@ -9,6 +9,7 @@ import React, {
   useCallback,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export type User = {
   userId: number;
@@ -92,9 +93,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       if (refreshReq.ok && !val.error) {
         await validateAndLogToken(true);
       } else if (refreshReq.status === 401 || refreshReq.status === 403) {
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
         await logout();
+      } else {
+        toast.error('Error temporal al refrescar la sesión.');
       }
     } catch (error) {
+      toast.error('Error de red al intentar refrescar la sesión.');
       console.error('Error de red al intentar refrescar la sesión.', error);
     }
   }, [validateAndLogToken, logout]);

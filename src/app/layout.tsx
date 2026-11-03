@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { TRPCReactProvider } from '@/trpc/react';
 import { UserProvider } from '@/contexts';
+import { ToastProvider } from '@/components/atoms';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <Suspense fallback={null}>
             <UserProvider>{children}</UserProvider>
           </Suspense>
+          <ToastProvider />
         </TRPCReactProvider>
       </body>
     </html>

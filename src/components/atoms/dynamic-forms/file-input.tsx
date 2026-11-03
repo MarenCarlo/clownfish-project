@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useRef, useState, type InputHTMLAttributes } from 'react';
 
 export interface FileInputProps
