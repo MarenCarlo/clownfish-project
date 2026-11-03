@@ -7,6 +7,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  Suspense,
 } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { toast } from 'react-toastify';
@@ -36,23 +37,19 @@ const FullScreenLoader = () => (
   </div>
 );
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+function SessionEffects({
+  user,
+  setUser,
+  setIsLoading,
+  logout,
+}: {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  logout: () => Promise<void>;
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const login = useCallback((userData: User) => {
-    setUser(userData);
-  }, []);
-
-  const logout = useCallback(async () => {
-    setUser(null);
-    await fetch('/api/auth', { method: 'DELETE' });
-    router.push('/');
-  }, [router]);
 
   const validateAndLogToken = useCallback(
     async (silent = false) => {
@@ -82,7 +79,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         if (!silent) setIsLoading(false);
       }
     },
-    [router, pathname]
+    [router, pathname, setUser, setIsLoading]
   );
 
   const refreshSession = useCallback(async () => {
@@ -114,17 +111,66 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     if (user) {
       const interval = setInterval(() => {
-        refreshSession();
+        void refreshSession();
       }, 14 * 60 * 1000);
       return () => clearInterval(interval);
     }
   }, [user, refreshSession]);
 
+  return null;
+}
+
+export const UserProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const login = useCallback((userData: User) => {
+    setUser(userData);
+  }, []);
+
+  const logout = useCallback(async () => {
+    setUser(null);
+    await fetch('/api/auth', { method: 'DELETE' });
+    router.push('/');
+  }, [router]);
+
+  const refreshSession = useCallback(async () => {
+    try {
+      const refreshReq = await fetch('/api/auth/refresh', { method: 'PATCH' });
+      const val = await refreshReq.json();
+
+      if (refreshReq.ok && !val.error) {
+        const secureSession = await fetch('/api/auth/me', { method: 'GET' });
+        const meVal = await secureSession.json();
+        if (!meVal.error && meVal.data) {
+          setUser(meVal.data as User);
+        }
+      } else if (refreshReq.status === 401 || refreshReq.status === 403) {
+        toast.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        await logout();
+      }
+    } catch (error) {
+      console.error('Error de red al intentar refrescar la sesión.', error);
+    }
+  }, [logout]);
+
   return (
     <UserContext.Provider
       value={{ user, isLoading, login, logout, refreshSession }}
     >
-      {isLoading ? <FullScreenLoader /> : children}
+      <Suspense fallback={null}>
+        <SessionEffects
+          user={user}
+          setUser={setUser}
+          setIsLoading={setIsLoading}
+          logout={logout}
+        />
+      </Suspense>
+      {isLoading && <FullScreenLoader />}
+      {children}
     </UserContext.Provider>
   );
 };
