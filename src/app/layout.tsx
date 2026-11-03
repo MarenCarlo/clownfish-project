@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Clownfish - Atomic Design + tRPC',
-  description: 'Next.js 16 con estructura modular Atomic Design y tRPC',
+  title: 'Clownfish',
+  description: 'Clownfish',
 };
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {

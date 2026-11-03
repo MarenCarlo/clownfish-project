@@ -71,7 +71,7 @@ export const FileInput: React.FC<FileInputProps> = ({
           setIsDragging(false);
           if (!disabled) handleFiles(e.dataTransfer.files);
         }}
-        className={`group relative flex flex-col items-center justify-center p-6 border border-dashed rounded-none bg-white cursor-pointer transition-colors ${
+        className={`group relative flex flex-col items-center justify-center p-6 border border-dashed rounded-[15px] bg-white cursor-pointer transition-colors ${
           disabled
             ? 'opacity-40 cursor-not-allowed border-black'
             : isError
@@ -93,7 +93,7 @@ export const FileInput: React.FC<FileInputProps> = ({
         />
 
         <div className="flex flex-col items-center text-center gap-1.5">
-          <div className="w-10 h-10 rounded-none border border-black bg-white flex items-center justify-center text-black mb-1">
+          <div className="w-10 h-10 rounded-[15px] border border-black bg-white flex items-center justify-center text-black mb-1">
             <svg
               className="w-5 h-5"
               fill="none"
@@ -129,7 +129,7 @@ export const FileInput: React.FC<FileInputProps> = ({
           {selectedFiles.map((file, idx) => (
             <div
               key={`${file.name}-${idx}`}
-              className="flex items-center justify-between px-3 py-2 rounded-none bg-white border border-black text-xs text-black"
+              className="flex items-center justify-between px-3 py-2 rounded-[15px] bg-white border border-black text-xs text-black"
             >
               <div className="flex items-center gap-2 truncate pr-2">
                 <svg

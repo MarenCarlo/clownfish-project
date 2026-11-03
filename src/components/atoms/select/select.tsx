@@ -30,7 +30,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           disabled={disabled}
-          className={`w-full appearance-none px-3.5 py-2.5 pr-10 text-sm rounded-none border bg-white text-black transition-colors focus:outline-none focus:ring-1 disabled:opacity-40 cursor-pointer ${
+          className={`w-full appearance-none px-3.5 py-2.5 pr-10 text-sm rounded-[15px] border bg-white text-black transition-colors focus:outline-none focus:ring-1 disabled:opacity-40 cursor-pointer ${
             isError
               ? 'border-status-error text-status-error focus:ring-status-error'
               : 'border-black focus:border-black focus:ring-black'

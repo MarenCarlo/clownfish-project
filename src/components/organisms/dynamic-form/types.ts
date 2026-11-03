@@ -97,7 +97,7 @@ export function buildFormObject(schema: DynamicFormSchema): FormValues {
  */
 export const productFormSchema: DynamicFormSchema = {
   id: 'product-form',
-  title: 'Registro de Producto (Competencia)',
+  title: 'Captura de productos',
   description: 'Captura de precios, gramaje, código de barras y fotografía del producto.',
   submitText: 'Guardar Producto',
   resetText: 'Limpiar',
@@ -114,7 +114,7 @@ export const productFormSchema: DynamicFormSchema = {
       name: 'nombre',
       value: '',
       placeholder: 'Ej. Café Soluble Clásico',
-      colSpan: 1,
+      colSpan: 2,
       validation: {
         required: 'El nombre del producto es obligatorio.',
       },
@@ -141,7 +141,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       step: '0.01',
       placeholder: '0.00',
-      colSpan: 1,
+      colSpan: 2,
       validation: {
         required: 'El precio es obligatorio.',
         min: 0,
