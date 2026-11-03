@@ -1,4 +1,4 @@
-import type { SelectOption } from '@/components/atoms/select';
+import type { SelectOption } from '@/components/atoms/dynamic-forms';
 
 export type DynamicFieldType =
   | 'text'
@@ -114,7 +114,7 @@ export const productFormSchema: DynamicFormSchema = {
       name: 'nombre',
       value: '',
       placeholder: 'Ej. Café Soluble Clásico',
-      colSpan: 6,
+      colSpan: 8,
       validation: {
         required: 'El nombre del producto es obligatorio.',
       },
@@ -127,7 +127,7 @@ export const productFormSchema: DynamicFormSchema = {
       name: 'barras',
       value: '',
       placeholder: 'Ej. 7501058612345',
-      colSpan: 6,
+      colSpan: 4,
       validation: {
         required: 'El código de barras es obligatorio.',
       },

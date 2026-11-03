@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, type InputProps } from '@/components/atoms/input';
+import { Input, type InputProps } from '@/components/atoms/dynamic-forms';
 
 export interface FormFieldProps extends InputProps {
   label: string;

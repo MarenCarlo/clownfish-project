@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input } from '@/components/atoms/input';
-import { Textarea } from '@/components/atoms/textarea';
-import { Select } from '@/components/atoms/select';
-import { FileInput } from '@/components/atoms/file-input';
+import {
+  Input,
+  Textarea,
+  Select,
+  FileInput,
+} from '@/components/atoms/dynamic-forms';
 import type { FormFieldSchema } from '@/components/organisms/dynamic-form/types';
 
 export interface DynamicFormFieldProps {
