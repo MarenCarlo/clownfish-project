@@ -18,7 +18,7 @@ export const MainTemplate: React.FC<MainTemplateProps> = ({
     <div className="min-h-screen flex flex-col bg-white text-black font-sans selection:bg-black selection:text-white">
       {header}
       {hero}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {children}
       </main>
       {footer}

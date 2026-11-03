@@ -13,7 +13,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-black bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href={user ? '/productos' : '/'} className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-none border border-black bg-white flex items-center justify-center text-black">

@@ -10,7 +10,7 @@ export { productFormSchema, productObjectForm };
 export default function ProductosPage() {
   return (
     <MainTemplate>
-      <div className="max-w-3xl mx-auto py-8">
+      <div className="w-full">
         <DynamicForm schema={productFormSchema} />
       </div>
     </MainTemplate>
