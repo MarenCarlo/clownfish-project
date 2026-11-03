@@ -98,7 +98,7 @@ export function buildFormObject(schema: DynamicFormSchema): FormValues {
 export const productFormSchema: DynamicFormSchema = {
   id: 'product-form',
   title: 'Captura de productos',
-  description: 'Captura de precios, gramaje, código de barras y fotografía del producto.',
+  description: 'Captura de datos del producto.',
   submitText: 'Guardar Producto',
   resetText: 'Limpiar',
   layout: {
@@ -228,26 +228,32 @@ export const loginFormSchema: DynamicFormSchema = {
   },
   fields: [
     {
-      id: 'login_email',
+      id: 'login_username',
       order: 1,
-      type: 'email',
-      label: 'Correo Electrónico',
-      name: 'email',
+      type: 'text',
+      label: 'Usuario',
+      name: 'nameUser',
       value: '',
-      placeholder: 'correo@ejemplo.com',
+      placeholder: 'username',
       autoComplete: 'username',
       colSpan: 1,
+      validation: {
+        required: 'El usuario es obligatorio.',
+      },
     },
     {
       id: 'login_password',
       order: 2,
       type: 'password',
       label: 'Contraseña',
-      name: 'password',
+      name: 'passUser',
       value: '',
       placeholder: 'Ingrese su contraseña',
       autoComplete: 'current-password',
       colSpan: 1,
+      validation: {
+        required: 'La contraseña es obligatoria.',
+      },
     },
   ],
 };
