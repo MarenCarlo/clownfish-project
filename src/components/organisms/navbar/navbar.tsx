@@ -49,9 +49,23 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
               <button
                 type="button"
                 onClick={logout}
-                className="border border-black bg-white text-black px-3 py-1 text-xs font-medium hover:bg-black hover:text-white transition-colors cursor-pointer"
+                title="Cerrar Sesión"
+                aria-label="Cerrar Sesión"
+                className="border border-black bg-white text-black p-1.5 flex items-center justify-center hover:bg-black hover:text-white transition-colors cursor-pointer"
               >
-                Cerrar Sesión
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"
+                  />
+                </svg>
               </button>
             </>
           ) : (
