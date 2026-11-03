@@ -51,10 +51,10 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
                 onClick={logout}
                 title="Cerrar Sesión"
                 aria-label="Cerrar Sesión"
-                className="border border-black bg-white text-black p-1.5 flex items-center justify-center hover:bg-black hover:text-white transition-colors cursor-pointer"
+                className="text-black p-1 flex items-center justify-center hover:opacity-60 transition-opacity cursor-pointer"
               >
                 <svg
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
