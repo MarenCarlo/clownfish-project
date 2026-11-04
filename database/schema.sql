@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   `gramaje` DECIMAL(12, 3) NOT NULL COMMENT 'Cantidad o peso neto del producto (input: product_weight)',
   `unidad_gramaje_id` UUID NOT NULL COMMENT 'FK hacia tb_gramaje_units.id (input: product_unit)',
   `empresa_producto_id` UUID NOT NULL COMMENT 'FK hacia tb_companies.id (input: product_store)',
+  `en_oferta` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Indica si el producto está en oferta (1 = En oferta, 0 = Precio regular)',
   `observaciones` VARCHAR(250) NULL DEFAULT NULL COMMENT 'Notas adicionales, tienda o ubicación (input: product_notes)',
   `foto` VARCHAR(1024) NOT NULL COMMENT 'URL de la fotografía del producto almacenada en bucket/storage (input: product_photo)',
   `oasis_one_user_id` INT(11) NULL DEFAULT NULL COMMENT 'ID del usuario en oasis_one.auth_user que realizó la captura',
@@ -93,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   INDEX `idx_tb_products_precio` (`precio`),
   INDEX `idx_tb_products_unidad_gramaje` (`unidad_gramaje_id`),
   INDEX `idx_tb_products_empresa_producto` (`empresa_producto_id`),
+  INDEX `idx_tb_products_en_oferta` (`en_oferta`, `created_at`),
   INDEX `idx_tb_products_user_created` (`oasis_one_user_id`, `created_at`),
   INDEX `idx_tb_products_active_created` (`is_active`, `created_at`),
   CONSTRAINT `fk_tb_products_unidad_gramaje`
