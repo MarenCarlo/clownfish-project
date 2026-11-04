@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `tb_gramaje_units` (
   UNIQUE INDEX `uk_tb_gramaje_units_code` (`code`),
   INDEX `idx_tb_gramaje_units_active_order` (`is_active`, `display_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT INTO `tb_gramaje_units` (`id`, `code`, `label`, `display_order`, `is_active`)
 VALUES
   (UUID(), 'g',  'Gramos (g)',      1, 1),
@@ -42,6 +43,22 @@ ON DUPLICATE KEY UPDATE
   `is_active` = VALUES(`is_active`);
 
 -- -----------------------------------------------------
+-- Tabla Catálogo: tb_companies (Empresas / Competencia)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tb_companies` (
+  `id` UUID NOT NULL DEFAULT UUID(),
+  `code` VARCHAR(50) NOT NULL COMMENT 'Código corto o identificador único de la empresa',
+  `label` VARCHAR(150) NOT NULL COMMENT 'Nombre de la empresa visible en el selector (input: product_store)',
+  `display_order` INT NOT NULL DEFAULT 0 COMMENT 'Orden de visualización en el select',
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Estado lógico de la empresa (1 = Activo, 0 = Inactivo)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uk_tb_companies_code` (`code`),
+  INDEX `idx_tb_companies_active_order` (`is_active`, `display_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
 -- Tabla Principal: tb_products
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tb_products` (
@@ -51,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   `precio` DECIMAL(12, 2) NOT NULL COMMENT 'Precio capturado (input: product_price)',
   `gramaje` DECIMAL(12, 3) NOT NULL COMMENT 'Cantidad o peso neto del producto (input: product_weight)',
   `unidad_gramaje_id` UUID NOT NULL COMMENT 'FK hacia tb_gramaje_units.id (input: product_unit)',
+  `empresa_producto_id` UUID NOT NULL COMMENT 'FK hacia tb_companies.id (input: product_store)',
   `observaciones` VARCHAR(250) NULL DEFAULT NULL COMMENT 'Notas adicionales, tienda o ubicación (input: product_notes)',
   `foto` VARCHAR(1024) NOT NULL COMMENT 'URL de la fotografía del producto almacenada en bucket/storage (input: product_photo)',
   `oasis_one_user_id` INT(11) NULL DEFAULT NULL COMMENT 'ID del usuario en oasis_one.auth_user que realizó la captura',
@@ -63,11 +81,17 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   INDEX `idx_tb_products_nombre` (`nombre`),
   INDEX `idx_tb_products_precio` (`precio`),
   INDEX `idx_tb_products_unidad_gramaje` (`unidad_gramaje_id`),
+  INDEX `idx_tb_products_empresa_producto` (`empresa_producto_id`),
   INDEX `idx_tb_products_user_created` (`oasis_one_user_id`, `created_at`),
   INDEX `idx_tb_products_active_created` (`is_active`, `created_at`),
   CONSTRAINT `fk_tb_products_unidad_gramaje`
     FOREIGN KEY (`unidad_gramaje_id`)
     REFERENCES `tb_gramaje_units` (`id`)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT,
+  CONSTRAINT `fk_tb_products_empresa_producto`
+    FOREIGN KEY (`empresa_producto_id`)
+    REFERENCES `tb_companies` (`id`)
     ON UPDATE CASCADE
     ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

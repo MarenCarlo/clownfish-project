@@ -16,7 +16,10 @@ export default function ProductosPage() {
   const { data: gramajeUnits = [], isLoading: isLoadingUnits } =
     api.products.getGramajeUnits.useQuery();
 
-  const schemaWithUnits = useMemo<DynamicFormSchema>(() => {
+  const { data: companies = [], isLoading: isLoadingCompanies } =
+    api.products.getCompanies.useQuery();
+
+  const schemaWithCatalogs = useMemo<DynamicFormSchema>(() => {
     return {
       ...productFormSchema,
       fields: productFormSchema.fields.map((field) => {
@@ -32,15 +35,27 @@ export default function ProductosPage() {
             })),
           };
         }
+        if (field.id === 'product_store') {
+          return {
+            ...field,
+            placeholder: isLoadingCompanies
+              ? 'Cargando empresas...'
+              : 'Seleccione empresa...',
+            options: companies.map((company) => ({
+              label: company.label,
+              value: company.value,
+            })),
+          };
+        }
         return field;
       }),
     };
-  }, [gramajeUnits, isLoadingUnits]);
+  }, [gramajeUnits, isLoadingUnits, companies, isLoadingCompanies]);
 
   return (
     <MainTemplate>
       <div className="w-full">
-        <DynamicForm schema={schemaWithUnits} />
+        <DynamicForm schema={schemaWithCatalogs} />
       </div>
     </MainTemplate>
   );
