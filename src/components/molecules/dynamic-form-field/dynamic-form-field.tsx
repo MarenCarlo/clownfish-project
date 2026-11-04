@@ -250,14 +250,14 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           className="text-sm font-medium text-black flex items-center gap-1"
         >
           {field.label}
-          {isRequired && <span className="text-status-error font-bold">*</span>}
+          {isRequired && <span className="text-red-600 font-bold">*</span>}
         </label>
       </div>
 
       {renderControl()}
 
       {error ? (
-        <span className="text-xs text-status-error font-medium flex items-center gap-1">
+        <span className="text-xs text-red-600 font-medium flex items-center gap-1">
           <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"

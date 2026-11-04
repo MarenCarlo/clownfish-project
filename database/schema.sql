@@ -3,11 +3,7 @@
 -- VR: 1.0.0
 --
 -- DESCRIPTION:
--- Esquema inicial en MariaDB para la captura de productos y precios
--- de la competencia desde el formulario de productos.
--- Todos los IDs utilizan el tipo nativo UUID de MariaDB.
--- Las unidades de gramaje están normalizadas en su propia
--- tabla catálogo y la fotografía se almacena como URL string.
+-- Base de Datos para captura de data de productos y precios.
 -- -----------------------------------------------------
 
 START TRANSACTION;
@@ -29,13 +25,10 @@ CREATE TABLE IF NOT EXISTS `tb_gramaje_units` (
   `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Estado lógico de la opción (1 = Activo, 0 = Inactivo)',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_tb_gramaje_units_code` (`code`),
   INDEX `idx_tb_gramaje_units_active_order` (`is_active`, `display_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Opciones iniciales de Unidades de Gramaje
 INSERT INTO `tb_gramaje_units` (`id`, `code`, `label`, `display_order`, `is_active`)
 VALUES
   (UUID(), 'g',  'Gramos (g)',      1, 1),
@@ -65,18 +58,13 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Estado lógico del registro (1 = Activo, 0 = Eliminado)',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
   PRIMARY KEY (`id`),
-
-  -- Índices para búsquedas, relaciones y filtrado frecuente
   INDEX `idx_tb_products_barras` (`barras`),
   INDEX `idx_tb_products_nombre` (`nombre`),
   INDEX `idx_tb_products_precio` (`precio`),
   INDEX `idx_tb_products_unidad_gramaje` (`unidad_gramaje_id`),
   INDEX `idx_tb_products_user_created` (`oasis_one_user_id`, `created_at`),
   INDEX `idx_tb_products_active_created` (`is_active`, `created_at`),
-
-  -- Relación con el catálogo de unidades de gramaje
   CONSTRAINT `fk_tb_products_unidad_gramaje`
     FOREIGN KEY (`unidad_gramaje_id`)
     REFERENCES `tb_gramaje_units` (`id`)

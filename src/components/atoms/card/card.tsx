@@ -12,9 +12,8 @@ export const Card: React.FC<CardProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-none bg-white text-black p-6 ${
-        bordered ? 'border border-black' : ''
-      } ${className}`}
+      className={`rounded-xl bg-white text-black p-6 ${bordered ? 'border border-black' : ''
+        } ${className}`}
       {...props}
     >
       {children}

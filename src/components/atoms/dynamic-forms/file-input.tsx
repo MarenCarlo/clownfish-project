@@ -73,15 +73,14 @@ export const FileInput: React.FC<FileInputProps> = ({
           setIsDragging(false);
           if (!disabled) handleFiles(e.dataTransfer.files);
         }}
-        className={`group relative flex flex-col items-center justify-center p-6 border border-dashed rounded-[15px] bg-white cursor-pointer transition-colors ${
-          disabled
-            ? 'opacity-40 cursor-not-allowed border-black'
-            : isError
+        className={`group relative flex flex-col items-center justify-center p-6 border border-dashed rounded-[15px] bg-white cursor-pointer transition-colors ${disabled
+          ? 'opacity-40 cursor-not-allowed border-black'
+          : isError
             ? 'border-status-error'
             : isDragging
-            ? 'border-solid border-black'
-            : 'border-black hover:border-solid'
-        }`}
+              ? 'border-solid border-black'
+              : 'border-black hover:border-solid bg-gradient-to-r from-zinc-50 to-gray-100'
+          }`}
       >
         <input
           ref={inputRef}
@@ -90,7 +89,7 @@ export const FileInput: React.FC<FileInputProps> = ({
           multiple={multiple}
           disabled={disabled}
           onChange={(e) => handleFiles(e.target.files)}
-          className="hidden"
+          className="hidden "
           {...props}
         />
 
@@ -118,8 +117,7 @@ export const FileInput: React.FC<FileInputProps> = ({
           </p>
           <p className="text-xs text-black">
             {hint ??
-              `${accept ? `Formatos: ${accept}` : 'Cualquier archivo'} ${
-                maxSizeMb ? `(Máx. ${maxSizeMb} MB)` : ''
+              `${accept ? `Formatos: ${accept}` : 'Cualquier archivo'} ${maxSizeMb ? `(Máx. ${maxSizeMb} MB)` : ''
               }`}
           </p>
         </div>
