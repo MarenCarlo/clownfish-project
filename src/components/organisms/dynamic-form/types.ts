@@ -30,6 +30,11 @@ export interface FormFieldSchema {
   id: string;
   order?: number;
   name: string;
+  /**
+   * Nombre de la columna en la base de datos para construir dinámicamente el INSERT.
+   * Si no se especifica, se utiliza `name`.
+   */
+  dbColumn?: string;
   value?: unknown;
   type: DynamicFieldType;
   label: string;
@@ -62,6 +67,10 @@ export interface FormFieldSchema {
 
 export interface DynamicFormSchema {
   id: string;
+  /**
+   * Nombre de la tabla en la base de datos asociada a este formulario (ej. 'tb_products').
+   */
+  dbTable?: string;
   title?: string;
   description?: string;
   submitText?: string;
@@ -75,6 +84,127 @@ export interface DynamicFormSchema {
 
 export type FormValues = Record<string, unknown>;
 export type FormErrors = Record<string, string | undefined>;
+
+export interface SerializedFilePayload {
+  __isFile: true;
+  fileName: string;
+  mimeType: string;
+  base64: string;
+}
+
+export function isSerializedFilePayload(val: unknown): val is SerializedFilePayload {
+  return (
+    typeof val === 'object' &&
+    val !== null &&
+    '__isFile' in val &&
+    (val as SerializedFilePayload).__isFile === true
+  );
+}
+
+async function fileToSerializedPayload(file: File): Promise<SerializedFilePayload> {
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return {
+    __isFile: true,
+    fileName: file.name,
+    mimeType: file.type || 'application/octet-stream',
+    base64: btoa(binary),
+  };
+}
+
+/**
+ * Construye dinámicamente el objeto mapeado a las columnas de BD (`dbColumn` o `name`)
+ * a partir del esquema JSON y los valores actuales del formulario.
+ */
+export async function buildDbRecordFromSchema(
+  schema: DynamicFormSchema,
+  values: FormValues
+): Promise<Record<string, unknown>> {
+  const record: Record<string, unknown> = {};
+
+  for (const field of schema.fields) {
+    const key = field.name || field.id;
+    const dbCol = field.dbColumn || field.name;
+    if (!dbCol) continue;
+
+    const rawVal = values[key];
+
+    if (field.type === 'file') {
+      if (rawVal instanceof File) {
+        record[dbCol] = await fileToSerializedPayload(rawVal);
+      } else if (Array.isArray(rawVal) && rawVal[0] instanceof File) {
+        record[dbCol] = await fileToSerializedPayload(rawVal[0]);
+      } else {
+        record[dbCol] = rawVal ?? null;
+      }
+    } else if (field.type === 'number') {
+      record[dbCol] =
+        rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
+          ? Number(String(rawVal).trim())
+          : null;
+    } else {
+      record[dbCol] =
+        rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
+          ? String(rawVal).trim()
+          : null;
+    }
+  }
+
+  return record;
+}
+
+const SAFE_SQL_IDENTIFIER = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+/**
+ * Construye dinámicamente la sentencia SQL parametrizada `INSERT INTO ...`
+ * a partir del nombre de la tabla y las columnas definidas en el esquema JSON.
+ */
+export function buildDynamicInsertSql(
+  tableName: string,
+  dbRecord: Record<string, unknown>,
+  extraColumns: Record<string, unknown> = {}
+): {
+  sql: string;
+  columns: string[];
+  params: unknown[];
+} {
+  if (!SAFE_SQL_IDENTIFIER.test(tableName)) {
+    throw new Error(`Nombre de tabla inválido: ${tableName}`);
+  }
+
+  const combined: Record<string, unknown> = {
+    ...dbRecord,
+    ...extraColumns,
+  };
+
+  const columns: string[] = [];
+  const params: unknown[] = [];
+
+  for (const [col, val] of Object.entries(combined)) {
+    if (!SAFE_SQL_IDENTIFIER.test(col)) {
+      throw new Error(`Nombre de columna inválido en esquema: ${col}`);
+    }
+    columns.push(`\`${col}\``);
+    params.push(val === undefined ? null : val);
+  }
+
+  if (columns.length === 0) {
+    throw new Error('No se encontraron columnas para construir el INSERT.');
+  }
+
+  const placeholders = columns.map(() => '?').join(', ');
+  const sql = `INSERT INTO \`${tableName}\` (${columns.join(', ')}) VALUES (${placeholders})`;
+
+  return {
+    sql,
+    columns,
+    params,
+  };
+}
 
 /**
  * Construye dinámicamente el objeto JSON de valores (objectForm)
@@ -93,10 +223,11 @@ export function buildFormObject(schema: DynamicFormSchema): FormValues {
 
 /**
  * Esquema JSON para captura de datos de productos de la competencia
- * (Nombre, Código de Barras, Precio, Gramaje, Unidad, Foto y Observaciones).
+ * (Nombre, Código de Barras, Precio, Gramaje, Unidad, Empresa, Foto y Observaciones).
  */
 export const productFormSchema: DynamicFormSchema = {
   id: 'product-form',
+  dbTable: 'tb_products',
   title: 'Captura de productos',
   description: 'Ingreso de datos',
   submitText: 'Guardar Producto',
@@ -112,6 +243,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'text',
       label: 'Nombre del Producto',
       name: 'nombre',
+      dbColumn: 'nombre',
       value: '',
       placeholder: 'Ej. Café Soluble Clásico',
       colSpan: 12,
@@ -125,6 +257,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'text',
       label: 'Código de Barras',
       name: 'barras',
+      dbColumn: 'barras',
       value: '',
       placeholder: 'Ej. 7501058612345',
       colSpan: 4,
@@ -138,6 +271,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'number',
       label: 'Precio',
       name: 'precio',
+      dbColumn: 'precio',
       value: '',
       step: '0.01',
       placeholder: '0.00',
@@ -153,6 +287,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'number',
       label: 'Gramaje',
       name: 'gramaje',
+      dbColumn: 'gramaje',
       value: '',
       step: 'any',
       placeholder: 'Ej. 200',
@@ -168,6 +303,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'select',
       label: 'Unidad de Gramaje',
       name: 'unidad_gramaje',
+      dbColumn: 'unidad_gramaje_id',
       value: '',
       placeholder: 'Seleccione unidad...',
       options: [],
@@ -182,6 +318,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'select',
       label: 'Empresa',
       name: 'empresa_producto',
+      dbColumn: 'empresa_producto_id',
       value: '',
       placeholder: 'Seleccione empresa...',
       options: [],
@@ -196,6 +333,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'textarea',
       label: 'Observaciones',
       name: 'observaciones',
+      dbColumn: 'observaciones',
       value: '',
       placeholder: 'Notas sobre detalles del producto como ofertas u observaciones generales...',
       rows: 3,
@@ -208,6 +346,7 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'file',
       label: 'Fotografía del Producto',
       name: 'foto',
+      dbColumn: 'foto',
       value: null,
       accept: 'image/*',
       maxSizeMb: 10,

@@ -6,9 +6,12 @@ import {
   DynamicForm,
   productFormSchema,
   productObjectForm,
+  buildDbRecordFromSchema,
   type DynamicFormSchema,
+  type FormValues,
 } from '@/components/organisms/dynamic-form';
 import { api } from '@/trpc/react';
+import { toast } from 'react-toastify';
 
 export { productFormSchema, productObjectForm };
 
@@ -18,6 +21,15 @@ export default function ProductosPage() {
 
   const { data: companies = [], isLoading: isLoadingCompanies } =
     api.products.getCompanies.useQuery();
+
+  const createProductMutation = api.products.createProduct.useMutation({
+    onSuccess: (res) => {
+      toast.success(res.message || 'Producto registrado correctamente.');
+    },
+    onError: (err) => {
+      toast.error(err.message || 'Error al guardar el producto.');
+    },
+  });
 
   const schemaWithCatalogs = useMemo<DynamicFormSchema>(() => {
     return {
@@ -52,10 +64,19 @@ export default function ProductosPage() {
     };
   }, [gramajeUnits, isLoadingUnits, companies, isLoadingCompanies]);
 
+  const handleSubmit = async (values: FormValues) => {
+    // Convierte el formulario serializando archivos y respetando tipos
+    const payload = await buildDbRecordFromSchema(schemaWithCatalogs, values);
+    await createProductMutation.mutateAsync(payload);
+  };
+
   return (
     <MainTemplate>
       <div className="w-full">
-        <DynamicForm schema={schemaWithCatalogs} />
+        <DynamicForm
+          schema={schemaWithCatalogs}
+          onSubmit={handleSubmit}
+        />
       </div>
     </MainTemplate>
   );
