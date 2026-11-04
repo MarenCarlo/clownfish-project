@@ -12,8 +12,8 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
   const { user, logout } = useUser();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-black bg-white">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-40 w-full max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="h-16 px-6 bg-white border-x border-b border-black rounded-b-xl flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href={user ? '/productos' : '/'} className="flex items-center">
             <span className="font-bold text-lg text-black">
