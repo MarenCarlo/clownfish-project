@@ -249,6 +249,114 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   };
 
   const totalColumns = schema.layout?.columns ?? 12;
+  const autoDistribute = schema.layout?.autoDistribute ?? true;
+  const autoCenterSingle = schema.layout?.autoCenterSingle ?? true;
+
+  interface FormRowItem {
+    field: FormFieldSchema;
+    colSpan: number;
+    colStart?: number;
+    isCentered?: boolean;
+  }
+
+  // Agrupación dinámica en filas calculando space-between y centrado automático
+  const rows = useMemo(() => {
+    const rawRows: FormRowItem[][] = [];
+    let currentRow: FormRowItem[] = [];
+    let currentSpan = 0;
+
+    for (const field of sortedFields) {
+      const rawSpan = field.colSpan ?? totalColumns;
+      const span = Math.min(Math.max(rawSpan, 1), totalColumns);
+
+      if (currentSpan + span > totalColumns) {
+        if (currentRow.length > 0) {
+          rawRows.push(currentRow);
+        }
+        currentRow = [{ field, colSpan: span }];
+        currentSpan = span;
+      } else {
+        currentRow.push({ field, colSpan: span });
+        currentSpan += span;
+      }
+    }
+
+    if (currentRow.length > 0) {
+      rawRows.push(currentRow);
+    }
+
+    return rawRows.map((row) => {
+      const rowItemCount = row.length;
+      const totalSpan = row.reduce((acc, item) => acc + item.colSpan, 0);
+      const leftoverCols = totalColumns - totalSpan;
+
+      // 1. Caso de un solo elemento en la fila
+      if (rowItemCount === 1) {
+        const item = row[0];
+        const fieldJustify = item.field.justify;
+
+        // Centrado automático si está solicitado explícitamente o si autoCenterSingle está activo y sobran columnas
+        const shouldCenter =
+          fieldJustify === 'center' ||
+          (autoCenterSingle && fieldJustify !== 'start' && leftoverCols > 0);
+
+        if (shouldCenter) {
+          const startCol = leftoverCols > 0 ? Math.floor(leftoverCols / 2) + 1 : 1;
+          return [
+            {
+              ...item,
+              colStart: startCol,
+              isCentered: true,
+            },
+          ];
+        }
+
+        return [
+          {
+            ...item,
+            colStart: 1,
+            isCentered: false,
+          },
+        ];
+      }
+
+      // 2. Caso de 2 o más elementos en la fila con columnas faltantes por rellenar -> space-between automático
+      if (rowItemCount > 1 && leftoverCols > 0 && autoDistribute) {
+        return row.map((item, index) => {
+          if (item.field.justify === 'start') {
+            return item;
+          }
+
+          // Posicionamiento de distribución:
+          // Primer elemento al inicio (col-start-1)
+          // Último elemento al final (col-start-[totalColumns - span + 1])
+          // Elementos intermedios distribuidos equitativamente
+          let startCol = 1;
+          if (index === 0) {
+            startCol = 1;
+          } else if (index === rowItemCount - 1) {
+            startCol = totalColumns - item.colSpan + 1;
+          } else {
+            const accumulatedPrevSpan = row
+              .slice(0, index)
+              .reduce((acc, prev) => acc + prev.colSpan, 0);
+            startCol =
+              1 +
+              accumulatedPrevSpan +
+              Math.floor((index * leftoverCols) / (rowItemCount - 1));
+          }
+
+          return {
+            ...item,
+            colStart: startCol,
+          };
+        });
+      }
+
+      // Caso estándar sin distribución especial
+      return row;
+    });
+  }, [sortedFields, totalColumns, autoDistribute, autoCenterSingle]);
 
   const getColSpanClass = (colSpan?: number) => {
     const rawSpan = colSpan ?? totalColumns;
@@ -270,6 +378,26 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     };
 
     return colSpanMap[clampedSpan] ?? 'col-span-1 sm:col-span-12';
+  };
+
+  const getColStartClass = (colStart?: number) => {
+    if (!colStart) return '';
+    const clampedStart = Math.min(Math.max(colStart, 1), 12);
+    const colStartMap: Record<number, string> = {
+      1: 'sm:col-start-1',
+      2: 'sm:col-start-2',
+      3: 'sm:col-start-3',
+      4: 'sm:col-start-4',
+      5: 'sm:col-start-5',
+      6: 'sm:col-start-6',
+      7: 'sm:col-start-7',
+      8: 'sm:col-start-8',
+      9: 'sm:col-start-9',
+      10: 'sm:col-start-10',
+      11: 'sm:col-start-11',
+      12: 'sm:col-start-12',
+    };
+    return colStartMap[clampedStart] ?? '';
   };
 
   const getGridColsClass = () => {
@@ -323,23 +451,34 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         </div>
       )}
 
-      {/* Cuadricula dinamica ordenada por 'order' */}
-      <div className={`grid ${getGridGapClass()} ${getGridColsClass()}`}>
-        {sortedFields.map((field) => {
-          const key = getFieldKey(field);
-          return (
-            <div key={field.id} className={getColSpanClass(field.colSpan)}>
-              <DynamicFormField
-                field={field}
-                value={values[key]}
-                error={errors[key]}
-                disabled={disabled || isSubmitting}
-                onChange={(newVal) => handleFieldChange(field, newVal)}
-                onBlur={() => handleFieldBlur(field)}
-              />
-            </div>
-          );
-        })}
+      {/* Cuadricula dinamica ordenada por 'order' y distribuida en filas inteligentes */}
+      <div className={`flex flex-col ${getGridGapClass()}`}>
+        {rows.map((row, rowIndex) => (
+          <div
+            key={`row-${rowIndex}`}
+            className={`grid ${getGridGapClass()} ${getGridColsClass()}`}
+          >
+            {row.map(({ field, colSpan, colStart, isCentered }) => {
+              const key = getFieldKey(field);
+              return (
+                <div
+                  key={field.id}
+                  className={`${getColSpanClass(colSpan)} ${getColStartClass(colStart)}`}
+                >
+                  <DynamicFormField
+                    field={field}
+                    isCentered={isCentered}
+                    value={values[key]}
+                    error={errors[key]}
+                    disabled={disabled || isSubmitting}
+                    onChange={(newVal) => handleFieldChange(field, newVal)}
+                    onBlur={() => handleFieldBlur(field)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {/* Barra de Acciones */}

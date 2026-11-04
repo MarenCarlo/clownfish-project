@@ -15,6 +15,7 @@ export interface DynamicFormFieldProps {
   value: unknown;
   error?: string;
   disabled?: boolean;
+  isCentered?: boolean;
   onChange: (value: unknown) => void;
   onBlur?: () => void;
 }
@@ -24,6 +25,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
   value,
   error,
   disabled = false,
+  isCentered = false,
   onChange,
   onBlur,
 }) => {
@@ -239,7 +241,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         if (!hasOptions) {
           const isChecked = Boolean(value);
           return (
-            <div className="pt-1">
+            <div className={`pt-1 ${isCentered ? 'flex justify-center' : ''}`}>
               <Checkbox
                 id={fieldId}
                 name={fieldName}
@@ -290,7 +292,9 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
         return (
           <div
             className={`flex ${
-              isHorizontal ? 'flex-row flex-wrap gap-4' : 'flex-col gap-2.5'
+              isHorizontal
+                ? `flex-row flex-wrap gap-4 ${isCentered ? 'justify-center' : ''}`
+                : `flex-col gap-2.5 ${isCentered ? 'items-center' : ''}`
             } pt-1`}
           >
             {(field.options as CheckboxOption[]).map((opt) => {
@@ -331,9 +335,9 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
     field.type === 'checkbox' && (!field.options || field.options.length === 0);
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      {!isSingleStandaloneCheckbox && (
-        <div className="flex items-center justify-between">
+    <div className={`flex flex-col gap-1.5 w-full ${isCentered ? 'items-center text-center' : ''}`}>
+      {!isSingleStandaloneCheckbox && field.label && (
+        <div className={`flex items-center ${isCentered ? 'justify-center' : 'justify-between'}`}>
           <label
             htmlFor={fieldId}
             data-name={fieldName}
@@ -349,7 +353,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
       {renderControl()}
 
       {error ? (
-        <span className="text-xs text-red-600 font-medium flex items-center gap-1">
+        <span className={`text-xs text-red-600 font-medium flex items-center gap-1 ${isCentered ? 'justify-center' : ''}`}>
           <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -360,7 +364,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           {error}
         </span>
       ) : field.type !== 'file' && field.helperText ? (
-        <span className="text-xs text-black">
+        <span className={`text-xs text-black ${isCentered ? 'text-center' : ''}`}>
           {field.helperText}
         </span>
       ) : null}

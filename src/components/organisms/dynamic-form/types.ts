@@ -79,6 +79,9 @@ export interface FormFieldSchema {
 
   // Espacio de columnas en grid (1 a 12)
   colSpan?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+
+  // Alineación / Justificación opcional en la fila
+  justify?: 'start' | 'center' | 'end' | 'between';
 }
 
 export interface DynamicFormSchema {
@@ -94,6 +97,8 @@ export interface DynamicFormSchema {
   layout?: {
     columns?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
     gap?: 'sm' | 'md' | 'lg';
+    autoDistribute?: boolean; // Pone space-between si faltan columnas por rellenar en una fila
+    autoCenterSingle?: boolean; // Centra en automático si un solo elemento tiene columnas sobrantes
   };
   fields: FormFieldSchema[];
 }
@@ -269,25 +274,13 @@ export const productFormSchema: DynamicFormSchema = {
   layout: {
     columns: 12,
     gap: 'md',
+    autoDistribute: true,
+    autoCenterSingle: true,
   },
   fields: [
     {
-      id: 'product_name',
-      order: 1,
-      type: 'text',
-      label: 'Nombre del Producto',
-      name: 'nombre',
-      dbColumn: 'nombre',
-      value: '',
-      placeholder: 'Ej. Café Soluble Clásico',
-      colSpan: 12,
-      validation: {
-        required: 'El nombre del producto es obligatorio.',
-      },
-    },
-    {
       id: 'product_barcode',
-      order: 2,
+      order: 1,
       type: 'text',
       label: 'Código de Barras',
       name: 'barras',
@@ -301,7 +294,7 @@ export const productFormSchema: DynamicFormSchema = {
     },
     {
       id: 'product_price',
-      order: 3,
+      order: 2,
       type: 'number',
       label: 'Precio',
       name: 'precio',
@@ -315,6 +308,21 @@ export const productFormSchema: DynamicFormSchema = {
         min: 0,
       },
     },
+    {
+      id: 'product_name',
+      order: 3,
+      type: 'text',
+      label: 'Nombre del Producto',
+      name: 'nombre',
+      dbColumn: 'nombre',
+      value: '',
+      placeholder: 'Ej. Café Soluble Clásico',
+      colSpan: 12,
+      validation: {
+        required: 'El nombre del producto es obligatorio.',
+      },
+    },
+
     {
       id: 'product_weight',
       order: 4,
@@ -357,6 +365,7 @@ export const productFormSchema: DynamicFormSchema = {
       placeholder: 'Seleccione empresa...',
       options: [],
       colSpan: 6,
+      justify: 'start',
       validation: {
         required: 'Seleccione una empresa.',
       },
@@ -375,7 +384,7 @@ export const productFormSchema: DynamicFormSchema = {
       options: [
         { label: 'En Oferta', value: 'oferta' },
       ],
-      colSpan: 12,
+      colSpan: 8,
     },
     {
       id: 'product_notes',
