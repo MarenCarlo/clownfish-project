@@ -156,7 +156,8 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
           <Input
             id={fieldId}
             name={fieldName}
-            type="number"
+            type="text"
+            inputMode="decimal"
             step={field.step}
             min={field.validation?.min}
             max={field.validation?.max}
@@ -168,8 +169,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
             readOnly={field.readOnly}
             isError={isError}
             onChange={(e) => {
-              const val = e.target.value;
-              onChange(val === '' ? '' : Number(val));
+              onChange(e.target.value);
             }}
             onBlur={onBlur}
           />

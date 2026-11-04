@@ -64,7 +64,9 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     (field: FormFieldSchema, val: unknown, allValues: FormValues): string | undefined => {
       const v = field.validation;
       const effectiveMaxLength = field.maxLength ?? v?.maxLength;
-      if (!v && effectiveMaxLength === undefined) return undefined;
+      if (!v && effectiveMaxLength === undefined && field.type !== 'number') {
+        return undefined;
+      }
 
       // Validacion de Requerido
       if (v?.required) {
@@ -73,7 +75,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             ? v.required
             : `${field.label} es obligatorio.`;
 
-        if (val === undefined || val === null || val === '') {
+        if (val === undefined || val === null || String(val).trim() === '') {
           return reqMessage;
         }
         if (Array.isArray(val) && val.length === 0) {
@@ -82,15 +84,17 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       }
 
       // Si el campo esta vacio y no es requerido, omitir resto de validaciones
-      if (val === undefined || val === null || val === '') {
+      if (val === undefined || val === null || String(val).trim() === '') {
         return undefined;
       }
 
       // Validaciones para 'number'
       if (field.type === 'number') {
-        const numVal = Number(val);
-        if (isNaN(numVal)) {
-          return 'Debe ser un número válido.';
+        const strVal = String(val).trim();
+        const isValidNumberFormat = /^-?\d+(\.\d+)?$/.test(strVal);
+        const numVal = Number(strVal);
+        if (!isValidNumberFormat || isNaN(numVal)) {
+          return 'Debe ingresar un número válido.';
         }
         if (v?.min !== undefined && numVal < v.min) {
           return `El valor mínimo permitido es ${v.min}.`;
@@ -150,8 +154,8 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
     setValues(updated);
     syncObjectForm(updated, schema.id);
 
-    // Limpiar error del campo si ya cumple
-    if (errors[key]) {
+    // Validar en tiempo real para campos tipo number o si ya existía un error activo
+    if (errors[key] || field.type === 'number') {
       const err = validateField(field, value, updated);
       setErrors((prev) => ({ ...prev, [key]: err }));
     }
