@@ -246,6 +246,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                 checked={isChecked}
                 disabled={isDisabled}
                 isError={isError}
+                align={field.checkboxAlign ?? 'horizontal'}
                 label={field.checkboxText || field.label}
                 description={field.helperText}
                 onChange={(checked) => onChange(checked)}
@@ -306,6 +307,7 @@ export const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
                   checked={isOptionChecked}
                   disabled={isDisabled || opt.disabled}
                   isError={isError}
+                  align={field.checkboxAlign ?? 'horizontal'}
                   label={opt.label}
                   description={opt.description}
                   onChange={() => handleOptionToggle(opt.value)}

@@ -8,6 +8,7 @@ export interface CheckboxProps
   description?: string;
   isError?: boolean;
   checked?: boolean;
+  align?: 'horizontal' | 'vertical';
   onChange?: (checked: boolean) => void;
 }
 
@@ -20,16 +21,21 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
       isError = false,
       checked = false,
       disabled = false,
+      align = 'horizontal',
       onChange,
       id,
       ...props
     },
     ref
   ) => {
+    const isVertical = align === 'vertical';
+
     return (
       <label
         htmlFor={id}
-        className={`inline-flex items-start gap-3 select-none cursor-pointer group ${
+        className={`inline-flex ${
+          isVertical ? 'flex-col items-center gap-1.5 text-center' : 'items-start gap-3'
+        } select-none cursor-pointer group ${
           disabled ? 'opacity-40 cursor-not-allowed' : ''
         } ${className}`}
       >
@@ -69,7 +75,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         </div>
 
         {(label || description) && (
-          <div className="flex flex-col text-sm leading-tight">
+          <div className={`flex flex-col text-sm leading-tight ${isVertical ? 'items-center text-center' : ''}`}>
             {label && (
               <span className="font-medium text-black">
                 {label}

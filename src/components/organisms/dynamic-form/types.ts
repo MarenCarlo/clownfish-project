@@ -63,6 +63,7 @@ export interface FormFieldSchema {
   selectionMode?: 'single' | 'multiple';
   checkboxText?: string;
   groupDirection?: 'horizontal' | 'vertical';
+  checkboxAlign?: 'horizontal' | 'vertical';
 
   // Especifico para file
   accept?: string;
@@ -364,12 +365,13 @@ export const productFormSchema: DynamicFormSchema = {
       id: 'field_tags',
       order: 7,
       type: 'checkbox',
-      label: 'Etiquetas del Producto',
+      label: '',
       name: 'etiquetas',
       dbColumn: 'en_oferta',
       value: [],
       selectionMode: 'multiple',
       groupDirection: 'horizontal',
+      checkboxAlign: 'vertical',
       options: [
         { label: 'En Oferta', value: 'oferta' },
       ],
