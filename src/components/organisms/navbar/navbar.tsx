@@ -25,9 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
         <nav className="flex items-center gap-4 text-sm font-medium text-black">
           {user ? (
             <>
-              <span className="text-xs font-mono border border-black px-2.5 py-1">
-                {user.userName}
-              </span>
+              <span className="text-xs font-mono px-2.5 py-1"></span>
               <button
                 type="button"
                 onClick={logout}
@@ -51,9 +49,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
               </button>
             </>
           ) : (
-            <Link href="/" className="hover:underline">
-              Login
-            </Link>
+            <span className="text-xs font-mono px-2.5 py-1"></span>
           )}
         </nav>
       </div>

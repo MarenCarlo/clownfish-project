@@ -17,6 +17,13 @@ export const config = {
       password: process.env.DB_AUTH_PASSWORD as string,
       name: process.env.DB_AUTH_NAME as string,
     },
+    clownfish: {
+      host: process.env.DB_HOST as string,
+      port: parseInt((process.env.DB_PORT as string) || '3306', 10),
+      user: process.env.DB_USER as string,
+      password: process.env.DB_PASSWORD as string,
+      name: process.env.DB_NAME as string,
+    },
   },
   auth: {
     jwtSecret: process.env.JWT_TOKEN_SECRET as string,
@@ -30,6 +37,12 @@ export const getMissingVariables = (): string[] => {
   if (!config.db.auth.password) missing.push('DB_AUTH_PASSWORD');
   if (!config.db.auth.user) missing.push('DB_AUTH_USER');
   if (!config.db.auth.name) missing.push('DB_AUTH_NAME');
+
+  if (!config.db.clownfish.host) missing.push('DB_HOST');
+  if (!config.db.clownfish.password) missing.push('DB_PASSWORD');
+  if (!config.db.clownfish.user) missing.push('DB_USER');
+  if (!config.db.clownfish.name) missing.push('DB_NAME');
+
   if (!config.auth.jwtSecret) missing.push('JWT_TOKEN_SECRET');
 
   if (missing.length > 0) {

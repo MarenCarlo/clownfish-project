@@ -98,7 +98,7 @@ export function buildFormObject(schema: DynamicFormSchema): FormValues {
 export const productFormSchema: DynamicFormSchema = {
   id: 'product-form',
   title: 'Captura de productos',
-  description: 'Captura de datos del producto.',
+  description: 'Ingreso de datos',
   submitText: 'Guardar Producto',
   resetText: 'Limpiar',
   layout: {
@@ -168,15 +168,9 @@ export const productFormSchema: DynamicFormSchema = {
       type: 'select',
       label: 'Unidad de Gramaje',
       name: 'unidad_gramaje',
-      value: 'g',
+      value: '',
       placeholder: 'Seleccione unidad...',
-      options: [
-        { label: 'Gramos (g)', value: 'g' },
-        { label: 'Kilogramos (kg)', value: 'kg' },
-        { label: 'Mililitros (ml)', value: 'ml' },
-        { label: 'Litros (L)', value: 'l' },
-        { label: 'Pieza (pz)', value: 'pz' },
-      ],
+      options: [],
       colSpan: 4,
       validation: {
         required: 'Seleccione una unidad de medida.',
