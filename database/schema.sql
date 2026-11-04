@@ -58,6 +58,19 @@ CREATE TABLE IF NOT EXISTS `tb_companies` (
   INDEX `idx_tb_companies_active_order` (`is_active`, `display_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+INSERT INTO `tb_companies` (`id`, `code`, `label`, `display_order`, `is_active`)
+VALUES
+  (UUID(), 'la_torre',          'La Torre',          1, 1),
+  (UUID(), 'maxidespensa',      'Maxidespensa',      2, 1),
+  (UUID(), 'despensa_familiar', 'Despensa Familiar', 3, 1),
+  (UUID(), 'paiz',              'Paiz',              4, 1),
+  (UUID(), 'super_el_barrio',   'Super el barrio',   5, 1),
+  (UUID(), 'suma',              'Suma',              6, 1)
+ON DUPLICATE KEY UPDATE
+  `label` = VALUES(`label`),
+  `display_order` = VALUES(`display_order`),
+  `is_active` = VALUES(`is_active`);
+
 -- -----------------------------------------------------
 -- Tabla Principal: tb_products
 -- -----------------------------------------------------
