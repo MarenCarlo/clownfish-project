@@ -3,10 +3,8 @@
 -- VR: 1.0.0
 --
 -- DESCRIPTION:
--- Esquema inicial para la captura de productos y precios
--- de la competencia desde el formulario de productos.
--- Las unidades de gramaje están normalizadas en su propia
--- tabla catálogo y la fotografía se almacena como URL string.
+-- Base de datos para la captura de productos y precios desde 
+-- el formulario de productos.
 -- -----------------------------------------------------
 
 CREATE DATABASE IF NOT EXISTS `ClownfishDB`

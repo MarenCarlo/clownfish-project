@@ -26,6 +26,18 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Ocultar flechas (spinners) en inputs de tipo number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Estilizado personalizado de notificaciones Toast (Cuadro negro, icono y texto blancos) */
 .Toastify__toast.clownfish-toast {
   background-color: #000000 !important;
