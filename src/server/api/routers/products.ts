@@ -33,18 +33,18 @@ export const productsRouter = createTRPCRouter({
 
   getCompanies: publicProcedure.query(async (): Promise<CompanyOption[]> => {
     const [rows] = await clownfishDb.execute<RowDataPacket[]>(
-      `SELECT id, code, label, display_order
+      `SELECT id, code, label
        FROM tb_companies
        WHERE is_active = 1
-       ORDER BY display_order ASC, label ASC`
+       ORDER BY label ASC`
     );
 
-    return rows.map((row) => ({
+    return rows.map((row, idx) => ({
       id: String(row.id),
       code: String(row.code),
       label: String(row.label),
       value: String(row.id),
-      displayOrder: Number(row.display_order ?? 0),
+      displayOrder: idx + 1,
     }));
   }),
 });

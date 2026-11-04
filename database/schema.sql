@@ -49,26 +49,24 @@ CREATE TABLE IF NOT EXISTS `tb_companies` (
   `id` UUID NOT NULL DEFAULT UUID(),
   `code` VARCHAR(50) NOT NULL COMMENT 'Código corto o identificador único de la empresa',
   `label` VARCHAR(150) NOT NULL COMMENT 'Nombre de la empresa visible en el selector (input: product_store)',
-  `display_order` INT NOT NULL DEFAULT 0 COMMENT 'Orden de visualización en el select',
   `is_active` TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'Estado lógico de la empresa (1 = Activo, 0 = Inactivo)',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_tb_companies_code` (`code`),
-  INDEX `idx_tb_companies_active_order` (`is_active`, `display_order`)
+  INDEX `idx_tb_companies_active_label` (`is_active`, `label`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO `tb_companies` (`id`, `code`, `label`, `display_order`, `is_active`)
+INSERT INTO `tb_companies` (`id`, `code`, `label`, `is_active`)
 VALUES
-  (UUID(), 'la_torre',          'La Torre',          1, 1),
-  (UUID(), 'maxidespensa',      'Maxidespensa',      2, 1),
-  (UUID(), 'despensa_familiar', 'Despensa Familiar', 3, 1),
-  (UUID(), 'paiz',              'Paiz',              4, 1),
-  (UUID(), 'super_el_barrio',   'Super el barrio',   5, 1),
-  (UUID(), 'suma',              'Suma',              6, 1)
+  (UUID(), 'LTR',          'La Torre', 1),
+  (UUID(), 'MDS',      'Maxidespensa', 1),
+  (UUID(), 'DFM', 'Despensa Familiar', 1),
+  (UUID(), 'PAZ',              'Paiz', 1),
+  (UUID(), 'SEB',   'Super el barrio', 1),
+  (UUID(), 'SUM',              'Suma', 1)
 ON DUPLICATE KEY UPDATE
   `label` = VALUES(`label`),
-  `display_order` = VALUES(`display_order`),
   `is_active` = VALUES(`is_active`);
 
 -- -----------------------------------------------------
