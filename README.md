@@ -141,6 +141,14 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | `rows` | `number` | Altura fija en número de filas visibles (redimensionamiento manual deshabilitado con `resize-none`). |
 | `maxLength` | `number` | Límite máximo de caracteres permitidos. Muestra un contador en tiempo real (`actual/máximo`) en la esquina inferior derecha dentro del `Textarea`. |
 
+#### Para `type: "checkbox"`
+| Propiedad | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `checkboxText` | `string` | Texto visible al lado del checkbox cuando se usa en modo individual (sin `options`). |
+| `options` | `Array<{ label: string; value: string \| number; description?: string; disabled?: boolean }>` | Lista de opciones para grupos de checkboxes. |
+| `selectionMode` | `'single' \| 'multiple'` | En grupos: `'multiple'` (por defecto, permite selección variada como array `['a', 'b']`), `'single'` (permite selección única mutuamente excluyente tipo radio). |
+| `groupDirection`| `'vertical' \| 'horizontal'` | Disposición visual de las opciones en columna o fila flexible (`'vertical'` por defecto). |
+
 ---
 
 ### 4.4. Objeto de Validaciones (`validation`)
@@ -152,6 +160,8 @@ A continuación se detalla cada propiedad disponible para estructurar el objeto 
 | `max` | `number` | Valor numérico máximo permitido (`type: "number"`). |
 | `minLength` | `number` | Longitud mínima de caracteres (`text`, `textarea`). |
 | `maxLength` | `number` | Longitud máxima de caracteres (`text`, `textarea`). |
+| `minSelect` | `number` | Cantidad mínima de opciones requeridas para grupos de `checkbox` (`multiple`). |
+| `maxSelect` | `number` | Cantidad máxima de opciones permitidas para grupos de `checkbox` (`multiple`). |
 | `pattern` | `string \| RegExp` | Expresión regular para validar el contenido. |
 | `patternMessage`| `string` | Mensaje de error personalizado en caso de fallar el patrón. |
 | `maxSizeMb` | `number` | Límite de tamaño para archivos en MB. |

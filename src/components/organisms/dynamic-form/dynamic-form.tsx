@@ -75,17 +75,43 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
             ? v.required
             : `${field.label} es obligatorio.`;
 
-        if (val === undefined || val === null || String(val).trim() === '') {
-          return reqMessage;
-        }
-        if (Array.isArray(val) && val.length === 0) {
-          return reqMessage;
+        if (field.type === 'checkbox') {
+          if (field.options && field.options.length > 0) {
+            if (Array.isArray(val) && val.length === 0) {
+              return reqMessage;
+            }
+            if (!Array.isArray(val) && (val === undefined || val === null || String(val).trim() === '')) {
+              return reqMessage;
+            }
+          } else if (!val) {
+            return reqMessage;
+          }
+        } else {
+          if (val === undefined || val === null || String(val).trim() === '') {
+            return reqMessage;
+          }
+          if (Array.isArray(val) && val.length === 0) {
+            return reqMessage;
+          }
         }
       }
 
       // Si el campo esta vacio y no es requerido, omitir resto de validaciones
-      if (val === undefined || val === null || String(val).trim() === '') {
+      if (
+        (val === undefined || val === null || String(val).trim() === '' || val === false) &&
+        (!Array.isArray(val) || val.length === 0)
+      ) {
         return undefined;
+      }
+
+      // Validaciones para 'checkbox' con grupo (minSelect, maxSelect)
+      if (field.type === 'checkbox' && Array.isArray(val)) {
+        if (v?.minSelect !== undefined && val.length < v.minSelect) {
+          return `Debe seleccionar al menos ${v.minSelect} ${v.minSelect === 1 ? 'opción' : 'opciones'}.`;
+        }
+        if (v?.maxSelect !== undefined && val.length > v.maxSelect) {
+          return `No puede seleccionar más de ${v.maxSelect} ${v.maxSelect === 1 ? 'opción' : 'opciones'}.`;
+        }
       }
 
       // Validaciones para 'number'

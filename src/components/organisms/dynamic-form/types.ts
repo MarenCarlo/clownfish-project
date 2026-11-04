@@ -9,7 +9,15 @@ export type DynamicFieldType =
   | 'url'
   | 'textarea'
   | 'file'
-  | 'select';
+  | 'select'
+  | 'checkbox';
+
+export interface CheckboxOption {
+  label: string;
+  value: string | number;
+  description?: string;
+  disabled?: boolean;
+}
 
 export interface FieldValidation {
   required?: boolean | string;
@@ -17,6 +25,8 @@ export interface FieldValidation {
   max?: number;
   minLength?: number;
   maxLength?: number;
+  minSelect?: number;
+  maxSelect?: number;
   pattern?: string | RegExp;
   patternMessage?: string;
   maxSizeMb?: number;
@@ -46,8 +56,13 @@ export interface FormFieldSchema {
   readOnly?: boolean;
   validation?: FieldValidation;
 
-  // Especifico para select
-  options?: SelectOption[];
+  // Especifico para select / checkbox group
+  options?: (SelectOption | CheckboxOption)[];
+
+  // Especifico para checkbox
+  selectionMode?: 'single' | 'multiple';
+  checkboxText?: string;
+  groupDirection?: 'horizontal' | 'vertical';
 
   // Especifico para file
   accept?: string;
@@ -146,6 +161,14 @@ export async function buildDbRecordFromSchema(
         rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
           ? Number(String(rawVal).trim())
           : null;
+    } else if (field.type === 'checkbox') {
+      if (Array.isArray(rawVal)) {
+        record[dbCol] = JSON.stringify(rawVal);
+      } else if (typeof rawVal === 'boolean') {
+        record[dbCol] = rawVal ? 1 : 0;
+      } else {
+        record[dbCol] = rawVal ?? null;
+      }
     } else {
       record[dbCol] =
         rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
@@ -213,10 +236,15 @@ export function buildDynamicInsertSql(
 export function buildFormObject(schema: DynamicFormSchema): FormValues {
   return schema.fields.reduce<FormValues>((acc, field) => {
     const key = field.name || field.id;
-    acc[key] =
-      field.value ??
-      field.defaultValue ??
-      (field.type === 'file' ? null : '');
+    let fallback: unknown = '';
+    if (field.type === 'file') {
+      fallback = null;
+    } else if (field.type === 'checkbox') {
+      fallback = field.options && field.options.length > 0
+        ? (field.selectionMode === 'single' ? '' : [])
+        : false;
+    }
+    acc[key] = field.value ?? field.defaultValue ?? fallback;
     return acc;
   }, {});
 }
@@ -349,7 +377,7 @@ export const productFormSchema: DynamicFormSchema = {
       dbColumn: 'foto',
       value: null,
       accept: 'image/*',
-      maxSizeMb: 10,
+      maxSizeMb: 5,
       helperText: 'Subir foto del producto o etiqueta de precio en anaquel (JPG, PNG, WEBP).',
       colSpan: 12,
       validation: {
