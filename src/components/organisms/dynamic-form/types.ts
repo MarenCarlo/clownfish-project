@@ -333,7 +333,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       step: 'any',
       placeholder: 'Ej. 200',
-      colSpan: 4,
+      colSpan: 6,
       validation: {
         required: 'El gramaje es obligatorio.',
         min: 0,
@@ -384,7 +384,7 @@ export const productFormSchema: DynamicFormSchema = {
       options: [
         { label: 'En Oferta', value: 'oferta' },
       ],
-      colSpan: 8,
+      colSpan: 12,
     },
     {
       id: 'product_notes',

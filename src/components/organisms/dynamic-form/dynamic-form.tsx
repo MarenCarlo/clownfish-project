@@ -295,10 +295,16 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
         const item = row[0];
         const fieldJustify = item.field.justify;
 
-        // Centrado automático si está solicitado explícitamente o si autoCenterSingle está activo y sobran columnas
+        // Centrado si:
+        // - Se pide explícitamente fieldJustify === 'center'
+        // - O si autoCenterSingle está activo, no tiene justify: 'start', y:
+        //     a) sobran columnas (leftoverCols > 0), O
+        //     b) es un control inline/checkbox (incluso si tiene colSpan: 12)
         const shouldCenter =
           fieldJustify === 'center' ||
-          (autoCenterSingle && fieldJustify !== 'start' && leftoverCols > 0);
+          (autoCenterSingle &&
+            fieldJustify !== 'start' &&
+            (leftoverCols > 0 || item.field.type === 'checkbox'));
 
         if (shouldCenter) {
           const startCol = leftoverCols > 0 ? Math.floor(leftoverCols / 2) + 1 : 1;
