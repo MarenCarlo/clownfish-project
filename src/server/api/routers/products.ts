@@ -137,6 +137,28 @@ export const productsRouter = createTRPCRouter({
             }
             dbRecord[dbCol] = null;
           }
+        } else if (field.type === 'checkbox') {
+          if (Array.isArray(val)) {
+            if (dbCol === 'en_oferta') {
+              dbRecord[dbCol] = val.includes('oferta') || val.length > 0 ? 1 : 0;
+            } else {
+              dbRecord[dbCol] = JSON.stringify(val);
+            }
+          } else if (typeof val === 'boolean') {
+            dbRecord[dbCol] = val ? 1 : 0;
+          } else if (typeof val === 'number') {
+            dbRecord[dbCol] = val === 1 ? 1 : 0;
+          } else if (typeof val === 'string' && val.trim().length > 0) {
+            dbRecord[dbCol] = val.trim() === 'oferta' || val.trim() === 'true' || val.trim() === '1' ? 1 : 0;
+          } else {
+            if (field.validation?.required) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: `${field.label} es obligatorio.`,
+              });
+            }
+            dbRecord[dbCol] = 0;
+          }
         } else {
           if (val !== undefined && val !== null && String(val).trim() !== '') {
             dbRecord[dbCol] = String(val).trim();

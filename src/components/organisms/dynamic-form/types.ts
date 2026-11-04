@@ -163,11 +163,16 @@ export async function buildDbRecordFromSchema(
           : null;
     } else if (field.type === 'checkbox') {
       if (Array.isArray(rawVal)) {
-        record[dbCol] = JSON.stringify(rawVal);
+        // Si la columna de BD es un booleano (ej. en_oferta), evalúa si incluye el valor o tiene elementos
+        if (dbCol === 'en_oferta') {
+          record[dbCol] = rawVal.includes('oferta') || rawVal.length > 0 ? 1 : 0;
+        } else {
+          record[dbCol] = JSON.stringify(rawVal);
+        }
       } else if (typeof rawVal === 'boolean') {
         record[dbCol] = rawVal ? 1 : 0;
       } else {
-        record[dbCol] = rawVal ?? null;
+        record[dbCol] = rawVal ? 1 : 0;
       }
     } else {
       record[dbCol] =
@@ -356,8 +361,23 @@ export const productFormSchema: DynamicFormSchema = {
       },
     },
     {
-      id: 'product_notes',
+      id: 'field_tags',
       order: 7,
+      type: 'checkbox',
+      label: 'Etiquetas del Producto',
+      name: 'etiquetas',
+      dbColumn: 'en_oferta',
+      value: [],
+      selectionMode: 'multiple',
+      groupDirection: 'horizontal',
+      options: [
+        { label: 'En Oferta', value: 'oferta' },
+      ],
+      colSpan: 12,
+    },
+    {
+      id: 'product_notes',
+      order: 8,
       type: 'textarea',
       label: 'Observaciones',
       name: 'observaciones',
@@ -370,7 +390,7 @@ export const productFormSchema: DynamicFormSchema = {
     },
     {
       id: 'product_photo',
-      order: 8,
+      order: 9,
       type: 'file',
       label: 'Fotografía del Producto',
       name: 'foto',
