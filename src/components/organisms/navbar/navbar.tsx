@@ -13,16 +13,16 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
 
   return (
     <header className="sticky top-0 z-40 w-full max-w-3xl mx-auto px-4 sm:px-6">
-      <div className="h-16 px-6 bg-white border-x border-b border-black rounded-b-xl flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="relative h-16 px-6 bg-black border-x border-b border-black rounded-b-xl flex items-center justify-between before:content-[''] before:absolute before:bottom-full before:left-[-1px] before:right-[-1px] before:h-[100vh] before:bg-black before:border-x before:border-black before:pointer-events-none">
+        <div className="relative z-10 flex items-center gap-3">
           <Link href={user ? '/productos' : '/'} className="flex items-center">
-            <span className="font-bold text-lg text-black">
+            <span className="font-bold text-lg text-white">
               {title}
             </span>
           </Link>
         </div>
 
-        <nav className="flex items-center gap-4 text-sm font-medium text-black">
+        <nav className="relative z-10 flex items-center gap-4 text-sm font-medium text-black">
           {user ? (
             <>
               <span className="text-xs font-mono px-2.5 py-1"></span>
@@ -31,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({ title = 'Clownfish' }) => {
                 onClick={logout}
                 title="Cerrar Sesión"
                 aria-label="Cerrar Sesión"
-                className="text-black p-1 flex items-center justify-center hover:opacity-60 transition-opacity cursor-pointer"
+                className="text-white p-1 flex items-center justify-center hover:opacity-60 transition-opacity cursor-pointer"
               >
                 <svg
                   className="w-5 h-5"
