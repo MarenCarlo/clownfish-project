@@ -82,6 +82,9 @@ export interface FormFieldSchema {
 
   // Alineación / Justificación opcional en la fila
   justify?: 'start' | 'center' | 'end' | 'between';
+
+  // Nombres de campos que deben limpiarse automáticamente cuando este campo cambie
+  resetFieldsOnChange?: string[];
 }
 
 export interface DynamicFormSchema {
@@ -371,8 +374,40 @@ export const productFormSchema: DynamicFormSchema = {
       },
     },
     {
-      id: 'field_tags',
+      id: 'product_department',
       order: 7,
+      type: 'select',
+      label: 'Departamento',
+      name: 'departamento',
+      dbColumn: 'departamento_id',
+      value: '',
+      placeholder: 'Seleccione departamento...',
+      options: [],
+      colSpan: 6,
+      resetFieldsOnChange: ['municipio'],
+      validation: {
+        required: 'El departamento es obligatorio.',
+      },
+    },
+    {
+      id: 'product_municipality',
+      order: 8,
+      type: 'select',
+      label: 'Municipio',
+      name: 'municipio',
+      dbColumn: 'municipio_id',
+      value: '',
+      placeholder: 'Seleccione municipio...',
+      options: [],
+      colSpan: 6,
+      disabled: true,
+      validation: {
+        required: 'El municipio es obligatorio.',
+      },
+    },
+    {
+      id: 'field_tags',
+      order: 9,
       type: 'checkbox',
       label: '',
       name: 'etiquetas',
@@ -388,7 +423,7 @@ export const productFormSchema: DynamicFormSchema = {
     },
     {
       id: 'product_notes',
-      order: 8,
+      order: 10,
       type: 'textarea',
       label: 'Observaciones',
       name: 'observaciones',
@@ -401,7 +436,7 @@ export const productFormSchema: DynamicFormSchema = {
     },
     {
       id: 'product_photo',
-      order: 9,
+      order: 11,
       type: 'file',
       label: 'Fotografía del Producto',
       name: 'foto',

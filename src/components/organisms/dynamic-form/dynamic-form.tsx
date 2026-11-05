@@ -177,14 +177,30 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   const handleFieldChange = (field: FormFieldSchema, value: unknown) => {
     const key = getFieldKey(field);
     const updated = { ...values, [key]: value };
+
+    // Si el campo especifica limpiar otros campos dependientes al cambiar
+    if (field.resetFieldsOnChange && field.resetFieldsOnChange.length > 0) {
+      for (const fieldToReset of field.resetFieldsOnChange) {
+        updated[fieldToReset] = '';
+      }
+    }
+
     setValues(updated);
     syncObjectForm(updated, schema.id);
 
-    // Validar en tiempo real para campos tipo number o si ya existía un error activo
-    if (errors[key] || field.type === 'number') {
-      const err = validateField(field, value, updated);
-      setErrors((prev) => ({ ...prev, [key]: err }));
-    }
+    // Validar en tiempo real y limpiar errores de campos reseteados
+    setErrors((prev) => {
+      const nextErrors = { ...prev };
+      if (prev[key] || field.type === 'number') {
+        nextErrors[key] = validateField(field, value, updated);
+      }
+      if (field.resetFieldsOnChange) {
+        for (const fieldToReset of field.resetFieldsOnChange) {
+          delete nextErrors[fieldToReset];
+        }
+      }
+      return nextErrors;
+    });
 
     if (onChange) {
       onChange(updated);

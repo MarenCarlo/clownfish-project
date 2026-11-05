@@ -22,6 +22,10 @@ export interface CatalogOption {
 
 export type GramajeUnitOption = CatalogOption;
 export type CompanyOption = CatalogOption;
+export type DepartmentOption = CatalogOption;
+export interface MunicipalityOption extends CatalogOption {
+  departmentId: string;
+}
 
 export const productsRouter = createTRPCRouter({
   getGramajeUnits: publicProcedure.query(async (): Promise<GramajeUnitOption[]> => {
@@ -57,6 +61,58 @@ export const productsRouter = createTRPCRouter({
       displayOrder: idx + 1,
     }));
   }),
+
+  getDepartments: publicProcedure.query(async (): Promise<DepartmentOption[]> => {
+    try {
+      const [rows] = await clownfishDb.execute<RowDataPacket[]>(
+        `SELECT id, code, nombre as label, display_order
+         FROM tb_departamentos
+         WHERE is_active = 1
+         ORDER BY display_order ASC, nombre ASC`
+      );
+
+      return rows.map((row, idx) => ({
+        id: String(row.id),
+        code: String(row.code),
+        label: String(row.label),
+        value: String(row.id),
+        displayOrder: Number(row.display_order ?? idx + 1),
+      }));
+    } catch {
+      return [];
+    }
+  }),
+
+  getMunicipalities: publicProcedure
+    .input(
+      z.object({
+        departmentId: z.string().optional(),
+      })
+    )
+    .query(async ({ input }): Promise<MunicipalityOption[]> => {
+      if (!input.departmentId) return [];
+
+      try {
+        const [rows] = await clownfishDb.execute<RowDataPacket[]>(
+          `SELECT id, departamento_id, code, nombre as label, display_order
+           FROM tb_municipios
+           WHERE is_active = 1 AND departamento_id = ?
+           ORDER BY display_order ASC, nombre ASC`,
+          [input.departmentId]
+        );
+
+        return rows.map((row, idx) => ({
+          id: String(row.id),
+          departmentId: String(row.departamento_id),
+          code: String(row.code),
+          label: String(row.label),
+          value: String(row.id),
+          displayOrder: Number(row.display_order ?? idx + 1),
+        }));
+      } catch {
+        return [];
+      }
+    }),
 
   /**
    * Guarda un producto construyendo dinámicamente el query INSERT

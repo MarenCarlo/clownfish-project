@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { MainTemplate } from '@/components/templates';
 import {
   DynamicForm,
@@ -16,11 +16,22 @@ import { toast } from 'react-toastify';
 export { productFormSchema, productObjectForm };
 
 export default function ProductosPage() {
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+
   const { data: gramajeUnits = [], isLoading: isLoadingUnits } =
     api.products.getGramajeUnits.useQuery();
 
   const { data: companies = [], isLoading: isLoadingCompanies } =
     api.products.getCompanies.useQuery();
+
+  const { data: departments = [], isLoading: isLoadingDepartments } =
+    api.products.getDepartments.useQuery();
+
+  const { data: municipalities = [], isLoading: isLoadingMunicipalities } =
+    api.products.getMunicipalities.useQuery(
+      { departmentId: selectedDepartment },
+      { enabled: Boolean(selectedDepartment) }
+    );
 
   const createProductMutation = api.products.createProduct.useMutation({
     onSuccess: (res) => {
@@ -59,15 +70,60 @@ export default function ProductosPage() {
             })),
           };
         }
+        if (field.id === 'product_department') {
+          return {
+            ...field,
+            placeholder: isLoadingDepartments
+              ? 'Cargando departamentos...'
+              : 'Seleccione departamento...',
+            options: departments.map((dept) => ({
+              label: dept.label,
+              value: dept.value,
+            })),
+          };
+        }
+        if (field.id === 'product_municipality') {
+          const isDeptSelected = Boolean(selectedDepartment);
+          return {
+            ...field,
+            placeholder: !isDeptSelected
+              ? 'Seleccione primero un departamento...'
+              : isLoadingMunicipalities
+              ? 'Cargando municipios...'
+              : 'Seleccione municipio...',
+            disabled: !isDeptSelected || isLoadingMunicipalities,
+            options: municipalities.map((muni) => ({
+              label: muni.label,
+              value: muni.value,
+            })),
+          };
+        }
         return field;
       }),
     };
-  }, [gramajeUnits, isLoadingUnits, companies, isLoadingCompanies]);
+  }, [
+    gramajeUnits,
+    isLoadingUnits,
+    companies,
+    isLoadingCompanies,
+    departments,
+    isLoadingDepartments,
+    municipalities,
+    isLoadingMunicipalities,
+    selectedDepartment,
+  ]);
 
   const handleSubmit = async (values: FormValues) => {
     // Convierte el formulario serializando archivos y respetando tipos
     const payload = await buildDbRecordFromSchema(schemaWithCatalogs, values);
     await createProductMutation.mutateAsync(payload);
+  };
+
+  const handleFormChange = (values: FormValues) => {
+    const dept = String(values.departamento ?? '');
+    if (dept !== selectedDepartment) {
+      setSelectedDepartment(dept);
+    }
   };
 
   return (
@@ -76,6 +132,7 @@ export default function ProductosPage() {
         <DynamicForm
           schema={schemaWithCatalogs}
           onSubmit={handleSubmit}
+          onChange={handleFormChange}
         />
       </div>
     </MainTemplate>
