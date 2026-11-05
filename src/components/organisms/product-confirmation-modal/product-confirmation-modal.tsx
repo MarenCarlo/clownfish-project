@@ -81,7 +81,7 @@ const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({ foto, alt }) 
   if (previewUrl) {
     return (
       <div className="w-full flex flex-col items-center gap-2">
-        <div className="w-full h-44 rounded-[15px] border border-black bg-neutral-100 overflow-hidden flex items-center justify-center p-1">
+        <div className="w-full h-44 rounded-[15px] border border-black/20 bg-neutral-100 overflow-hidden flex items-center justify-center p-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={previewUrl}
@@ -106,7 +106,7 @@ const ProductImagePreview: React.FC<ProductImagePreviewProps> = ({ foto, alt }) 
   }
 
   return (
-    <div className="w-full h-44 rounded-[15px] border border-dashed border-black/40 bg-neutral-50 flex flex-col items-center justify-center text-neutral-500 p-4 text-center">
+    <div className="w-full h-44 rounded-[15px] border border-dashed border-black/20 bg-neutral-50 flex flex-col items-center justify-center text-neutral-500 p-4 text-center">
       <svg
         className="w-8 h-8 mb-2 opacity-50"
         fill="none"
@@ -215,9 +215,9 @@ export const ProductConfirmationModal: React.FC<ProductConfirmationModalProps> =
         }
       }}
     >
-      <div className="relative w-full max-w-2xl bg-white border border-black rounded-xl shadow-2xl overflow-hidden flex flex-col my-8 max-h-[92vh]">
+      <div className="relative w-full max-w-2xl bg-white border border-black/20 rounded-xl shadow-2xl overflow-hidden flex flex-col my-8 max-h-[92vh]">
         {/* Cabecera del Modal */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-black bg-white">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/20 bg-white">
           <div className="flex flex-col">
             <h2
               id="modal-product-confirm-title"
@@ -273,7 +273,7 @@ export const ProductConfirmationModal: React.FC<ProductConfirmationModalProps> =
                 </h3>
               </div>
 
-              <div className="p-3.5 rounded-[15px] border border-black bg-neutral-50 flex items-center justify-between">
+              <div className="p-3.5 rounded-[15px] border border-black/20 bg-neutral-50 flex items-center justify-between">
                 <div>
                   <span className="text-[11px] font-semibold text-neutral-600 block">
                     Precio Capturado
@@ -285,11 +285,11 @@ export const ProductConfirmationModal: React.FC<ProductConfirmationModalProps> =
 
                 <div>
                   {isOferta ? (
-                    <Badge variant="success" size="md">
+                    <Badge variant="success" size="md" className="border-black/20">
                       En Oferta
                     </Badge>
                   ) : (
-                    <Badge variant="neutral" size="md">
+                    <Badge variant="neutral" size="md" className="border-black/20">
                       Precio Regular
                     </Badge>
                   )}
@@ -300,14 +300,14 @@ export const ProductConfirmationModal: React.FC<ProductConfirmationModalProps> =
                 <span className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider block">
                   Código de Barras
                 </span>
-                <span className="font-mono text-sm font-bold text-black tracking-wider bg-neutral-100 px-2 py-0.5 rounded border border-neutral-300 inline-block mt-0.5">
+                <span className="font-mono text-sm font-bold text-black tracking-wider bg-neutral-100 px-2 py-0.5 rounded border border-black/20 inline-block mt-0.5">
                   {barras}
                 </span>
               </div>
             </div>
           </div>
 
-          <hr className="border-black/15" />
+          <hr className="border-black/20" />
 
           {/* Grilla Detallada de Campos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -368,7 +368,7 @@ export const ProductConfirmationModal: React.FC<ProductConfirmationModalProps> =
         </div>
 
         {/* Pie de Acciones */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-black bg-neutral-50">
+        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-black/20 bg-neutral-50">
           <Button
             type="button"
             variant="outline"
