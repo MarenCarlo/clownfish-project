@@ -241,7 +241,7 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       try {
         setIsSubmitting(true);
         await onSubmit(currentObjectForm);
-        toast.success('Formulario enviado y procesado con éxito.');
+        handleReset();
       } catch (err: unknown) {
         const message =
           err instanceof Error

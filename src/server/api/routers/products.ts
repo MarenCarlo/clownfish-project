@@ -138,7 +138,7 @@ export const productsRouter = createTRPCRouter({
         const dbCol = field.dbColumn || field.name;
         if (!dbCol) continue;
 
-        const val = input[key];
+        const val = input[dbCol] !== undefined ? input[dbCol] : input[key];
 
         // Manejo especial de archivos (subida a MinIO si viene como payload serializado)
         if (field.type === 'file' || dbCol === 'foto') {

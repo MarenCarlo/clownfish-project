@@ -126,17 +126,32 @@ export function isSerializedFilePayload(val: unknown): val is SerializedFilePayl
 }
 
 async function fileToSerializedPayload(file: File): Promise<SerializedFilePayload> {
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  if (typeof FileReader !== 'undefined') {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        const base64 = dataUrl.includes(',') ? dataUrl.split(',')[1] : dataUrl;
+        resolve({
+          __isFile: true,
+          fileName: file.name,
+          mimeType: file.type || 'application/octet-stream',
+          base64: base64 || '',
+        });
+      };
+      reader.onerror = () => reject(reader.error || new Error('Error al leer el archivo.'));
+      reader.readAsDataURL(file);
+    });
   }
+
+  // Fallback para entornos Node.js
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = Buffer.from(arrayBuffer).toString('base64');
   return {
     __isFile: true,
     fileName: file.name,
     mimeType: file.type || 'application/octet-stream',
-    base64: btoa(binary),
+    base64,
   };
 }
 
@@ -155,18 +170,21 @@ export async function buildDbRecordFromSchema(
     const dbCol = field.dbColumn || field.name;
     if (!dbCol) continue;
 
-    const rawVal = values[key];
+    const rawVal = values[key] !== undefined ? values[key] : values[dbCol];
+    let processedVal: unknown = rawVal;
 
     if (field.type === 'file') {
       if (rawVal instanceof File) {
-        record[dbCol] = await fileToSerializedPayload(rawVal);
+        processedVal = await fileToSerializedPayload(rawVal);
       } else if (Array.isArray(rawVal) && rawVal[0] instanceof File) {
-        record[dbCol] = await fileToSerializedPayload(rawVal[0]);
+        processedVal = await fileToSerializedPayload(rawVal[0]);
+      } else if (isSerializedFilePayload(rawVal)) {
+        processedVal = rawVal;
       } else {
-        record[dbCol] = rawVal ?? null;
+        processedVal = rawVal ?? null;
       }
     } else if (field.type === 'number') {
-      record[dbCol] =
+      processedVal =
         rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
           ? Number(String(rawVal).trim())
           : null;
@@ -174,20 +192,25 @@ export async function buildDbRecordFromSchema(
       if (Array.isArray(rawVal)) {
         // Si la columna de BD es un booleano (ej. en_oferta), evalúa si incluye el valor o tiene elementos
         if (dbCol === 'en_oferta') {
-          record[dbCol] = rawVal.includes('oferta') || rawVal.length > 0 ? 1 : 0;
+          processedVal = rawVal.includes('oferta') || rawVal.length > 0 ? 1 : 0;
         } else {
-          record[dbCol] = JSON.stringify(rawVal);
+          processedVal = JSON.stringify(rawVal);
         }
       } else if (typeof rawVal === 'boolean') {
-        record[dbCol] = rawVal ? 1 : 0;
+        processedVal = rawVal ? 1 : 0;
       } else {
-        record[dbCol] = rawVal ? 1 : 0;
+        processedVal = rawVal ? 1 : 0;
       }
     } else {
-      record[dbCol] =
+      processedVal =
         rawVal !== undefined && rawVal !== null && String(rawVal).trim() !== ''
           ? String(rawVal).trim()
           : null;
+    }
+
+    record[dbCol] = processedVal;
+    if (key !== dbCol) {
+      record[key] = processedVal;
     }
   }
 
