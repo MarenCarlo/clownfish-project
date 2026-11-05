@@ -367,7 +367,7 @@ export const productFormSchema: DynamicFormSchema = {
       value: '',
       placeholder: 'Seleccione empresa...',
       options: [],
-      colSpan: 6,
+      colSpan: 12,
       justify: 'start',
       validation: {
         required: 'Seleccione una empresa.',
