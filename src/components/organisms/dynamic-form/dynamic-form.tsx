@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useImperativeHandle } from 'react';
 import { toast } from 'react-toastify';
 import { Card } from '@/components/atoms/card';
 import { Button } from '@/components/atoms/button';
@@ -15,6 +15,12 @@ import {
   type FormErrors,
 } from './types';
 
+export interface DynamicFormHandle {
+  reset: () => void;
+  getValues: () => FormValues;
+  setValues: React.Dispatch<React.SetStateAction<FormValues>>;
+}
+
 export interface DynamicFormProps {
   schema?: DynamicFormSchema;
   initialValues?: FormValues;
@@ -23,18 +29,24 @@ export interface DynamicFormProps {
   disabled?: boolean;
   className?: string;
   showCardWrapper?: boolean;
+  resetOnSubmit?: boolean;
 }
 
-export const DynamicForm: React.FC<DynamicFormProps> = ({
-  schema = defaultFormSchema,
-  initialValues = {},
-  onSubmit,
-  onChange,
-  disabled = false,
-  className = '',
-  showCardWrapper = true,
-}) => {
-  const getFieldKey = (field: FormFieldSchema) => field.name || field.id;
+export const DynamicForm = React.forwardRef<DynamicFormHandle, DynamicFormProps>(
+  (
+    {
+      schema = defaultFormSchema,
+      initialValues = {},
+      onSubmit,
+      onChange,
+      disabled = false,
+      className = '',
+      showCardWrapper = true,
+      resetOnSubmit = true,
+    },
+    ref
+  ) => {
+    const getFieldKey = (field: FormFieldSchema) => field.name || field.id;
 
   // Inicializacion de valores en base a los names del esquema
   const [values, setValues] = useState<FormValues>(() => {
@@ -241,7 +253,9 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       try {
         setIsSubmitting(true);
         await onSubmit(currentObjectForm);
-        handleReset();
+        if (resetOnSubmit) {
+          handleReset();
+        }
       } catch (err: unknown) {
         const message =
           err instanceof Error
@@ -263,6 +277,12 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
       onChange(defaults);
     }
   };
+
+  useImperativeHandle(ref, () => ({
+    reset: handleReset,
+    getValues: () => values,
+    setValues,
+  }));
 
   const totalColumns = schema.layout?.columns ?? 12;
   const autoDistribute = schema.layout?.autoDistribute ?? true;
@@ -534,4 +554,6 @@ export const DynamicForm: React.FC<DynamicFormProps> = ({
   }
 
   return <div className={className}>{formContent}</div>;
-};
+});
+
+DynamicForm.displayName = 'DynamicForm';

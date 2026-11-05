@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { MainTemplate } from '@/components/templates';
 import {
   DynamicForm,
@@ -9,14 +9,19 @@ import {
   buildDbRecordFromSchema,
   type DynamicFormSchema,
   type FormValues,
+  type DynamicFormHandle,
 } from '@/components/organisms/dynamic-form';
+import { ProductConfirmationModal } from '@/components/organisms/product-confirmation-modal';
 import { api } from '@/trpc/react';
 import { toast } from 'react-toastify';
 
 export { productFormSchema, productObjectForm };
 
 export default function ProductosPage() {
+  const formRef = useRef<DynamicFormHandle>(null);
   const [selectedDepartment, setSelectedDepartment] = useState<string>('');
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
 
   const { data: gramajeUnits = [], isLoading: isLoadingUnits } =
     api.products.getGramajeUnits.useQuery();
@@ -36,6 +41,10 @@ export default function ProductosPage() {
   const createProductMutation = api.products.createProduct.useMutation({
     onSuccess: (res) => {
       toast.success(res.message || 'Producto registrado correctamente.');
+      setIsConfirmModalOpen(false);
+      setPendingValues(null);
+      formRef.current?.reset();
+      setSelectedDepartment('');
     },
     onError: (err) => {
       toast.error(err.message || 'Error al guardar el producto.');
@@ -113,9 +122,16 @@ export default function ProductosPage() {
     selectedDepartment,
   ]);
 
-  const handleSubmit = async (values: FormValues) => {
-    // Convierte el formulario serializando archivos y respetando tipos
-    const payload = await buildDbRecordFromSchema(schemaWithCatalogs, values);
+  // Al enviar el formulario se abre el modal de confirmación con los datos validados
+  const handleSubmit = (values: FormValues) => {
+    setPendingValues(values);
+    setIsConfirmModalOpen(true);
+  };
+
+  // Al confirmar en el modal, se procede a guardar en la base de datos
+  const handleConfirmSave = async () => {
+    if (!pendingValues) return;
+    const payload = await buildDbRecordFromSchema(schemaWithCatalogs, pendingValues);
     await createProductMutation.mutateAsync(payload);
   };
 
@@ -130,9 +146,20 @@ export default function ProductosPage() {
     <MainTemplate>
       <div className="w-full">
         <DynamicForm
+          ref={formRef}
           schema={schemaWithCatalogs}
           onSubmit={handleSubmit}
           onChange={handleFormChange}
+          resetOnSubmit={false}
+        />
+
+        <ProductConfirmationModal
+          isOpen={isConfirmModalOpen}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmSave}
+          isLoading={createProductMutation.isPending}
+          values={pendingValues}
+          schema={schemaWithCatalogs}
         />
       </div>
     </MainTemplate>
