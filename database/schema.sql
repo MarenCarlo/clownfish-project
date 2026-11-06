@@ -1,6 +1,6 @@
 -- -----------------------------------------------------
 -- BD: ClownfishDB
--- VR: 1.0.0
+-- VR: 1.0.4
 --
 -- DESCRIPTION:
 -- Base de Datos para captura de data de productos y precios.
@@ -144,8 +144,8 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  INDEX `idx_tb_products_barras` (`barras`),
   INDEX `idx_tb_products_nombre` (`nombre`),
+  FULLTEXT INDEX `ft_tb_products_nombre` (`nombre`),
   INDEX `idx_tb_products_precio` (`precio`),
   INDEX `idx_tb_products_unidad_gramaje` (`unidad_gramaje_id`),
   INDEX `idx_tb_products_empresa_producto` (`empresa_producto_id`),
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   INDEX `idx_tb_products_en_oferta` (`en_oferta`, `created_at`),
   INDEX `idx_tb_products_user_created` (`oasis_one_user_id`, `created_at`),
   INDEX `idx_tb_products_active_created` (`is_active`, `created_at`),
-  INDEX `idx_tb_products_4keys` (`barras`, `empresa_producto_id`, `departamento_id`, `municipio_id`, `is_active`),
+  UNIQUE INDEX `uk_tb_products_4keys` (`barras`, `empresa_producto_id`, `departamento_id`, `municipio_id`),
   CONSTRAINT `fk_tb_products_unidad_gramaje`
     FOREIGN KEY (`unidad_gramaje_id`)
     REFERENCES `tb_gramaje_units` (`id`)
