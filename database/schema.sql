@@ -154,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
   INDEX `idx_tb_products_en_oferta` (`en_oferta`, `created_at`),
   INDEX `idx_tb_products_user_created` (`oasis_one_user_id`, `created_at`),
   INDEX `idx_tb_products_active_created` (`is_active`, `created_at`),
+  INDEX `idx_tb_products_4keys` (`barras`, `empresa_producto_id`, `departamento_id`, `municipio_id`, `is_active`),
   CONSTRAINT `fk_tb_products_unidad_gramaje`
     FOREIGN KEY (`unidad_gramaje_id`)
     REFERENCES `tb_gramaje_units` (`id`)
@@ -174,6 +175,27 @@ CREATE TABLE IF NOT EXISTS `tb_products` (
     REFERENCES `tb_municipios` (`id`)
     ON UPDATE CASCADE
     ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------
+-- Tabla: tb_product_price_history (Historial de Precios)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tb_product_price_history` (
+  `id` UUID NOT NULL DEFAULT UUID(),
+  `product_id` UUID NOT NULL COMMENT 'FK hacia tb_products.id',
+  `precio` DECIMAL(12, 2) NOT NULL COMMENT 'Precio registrado en esta toma',
+  `en_oferta` TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Estado de oferta (1 = En oferta, 0 = Precio regular)',
+  `observaciones` VARCHAR(250) NULL DEFAULT NULL COMMENT 'Observaciones de esta captura de precio',
+  `oasis_one_user_id` INT(11) NULL DEFAULT NULL COMMENT 'ID del usuario en oasis_one.auth_user',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_tb_price_history_product` (`product_id`, `created_at` DESC),
+  INDEX `idx_tb_price_history_user` (`oasis_one_user_id`, `created_at`),
+  CONSTRAINT `fk_tb_price_history_product`
+    FOREIGN KEY (`product_id`)
+    REFERENCES `tb_products` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 COMMIT;

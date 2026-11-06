@@ -1,8 +1,9 @@
 import { z } from 'zod';
+import crypto from 'crypto';
 import { TRPCError } from '@trpc/server';
 import { createTRPCRouter, publicProcedure } from '../trpc';
 import { clownfishDb } from '@/lib/db';
-import { uploadFileToMinio } from '@/services/minioService';
+import { uploadFileToMinio, deleteFileFromMinio } from '@/services/minioService';
 import { getAuthUser } from '@/middlewares/auth';
 import {
   productFormSchema,
@@ -130,7 +131,55 @@ export const productsRouter = createTRPCRouter({
       const oasisOneUserId = userPayload?.userId ? Number(userPayload.userId) : null;
       const createdByUsername = userPayload?.userName ? String(userPayload.userName) : null;
 
-      // 2. Procesar las columnas definidas en el schema
+      // 2. Extraer las 4 claves maestras para verificar si el producto ya existe
+      const barras = String(input.barras ?? input.product_barcode ?? '').trim();
+      const empresaProductoId = String(
+        input.empresa_producto_id ?? input.empresa_producto ?? input.product_store ?? ''
+      ).trim();
+      const departamentoId = String(
+        input.departamento_id ?? input.departamento ?? input.product_department ?? ''
+      ).trim();
+      const municipioId = String(
+        input.municipio_id ?? input.municipio ?? input.product_municipality ?? ''
+      ).trim();
+
+      // Consultar si ya existe un producto activo con esas 4 llaves
+      let existingProduct: {
+        id: string;
+        nombre: string;
+        precio: number;
+        en_oferta: number;
+        foto: string;
+        observaciones: string | null;
+      } | null = null;
+
+      if (barras && empresaProductoId && departamentoId && municipioId) {
+        const [existingRows] = await clownfishDb.execute<RowDataPacket[]>(
+          `SELECT id, nombre, precio, en_oferta, foto, observaciones
+           FROM tb_products
+           WHERE barras = ?
+             AND empresa_producto_id = ?
+             AND departamento_id = ?
+             AND municipio_id = ?
+             AND is_active = 1
+           LIMIT 1`,
+          [barras, empresaProductoId, departamentoId, municipioId]
+        );
+
+        if (existingRows.length > 0) {
+          const row = existingRows[0]!;
+          existingProduct = {
+            id: String(row.id),
+            nombre: String(row.nombre),
+            precio: Number(row.precio),
+            en_oferta: Number(row.en_oferta ?? 0),
+            foto: String(row.foto ?? ''),
+            observaciones: row.observaciones ? String(row.observaciones) : null,
+          };
+        }
+      }
+
+      // 3. Procesar las columnas definidas en el schema
       const dbRecord: Record<string, unknown> = {};
 
       for (const field of productFormSchema.fields) {
@@ -155,6 +204,12 @@ export const productsRouter = createTRPCRouter({
                 minioFileName,
                 filePayload.mimeType
               );
+
+              // Si el producto ya existía y tenía una foto anterior, la eliminamos para evitar archivos basura
+              if (existingProduct?.foto) {
+                await deleteFileFromMinio(existingProduct.foto);
+              }
+
               dbRecord[dbCol] = fileUrl;
             } catch (uploadErr) {
               console.error('[MinIO Error]:', uploadErr);
@@ -165,6 +220,9 @@ export const productsRouter = createTRPCRouter({
             }
           } else if (typeof val === 'string' && val.trim().length > 0) {
             dbRecord[dbCol] = val.trim();
+          } else if (existingProduct?.foto) {
+            // Si el producto ya existe y no se adjuntó nueva foto, conservamos la actual
+            dbRecord[dbCol] = existingProduct.foto;
           } else {
             if (field.validation?.required) {
               throw new TRPCError({
@@ -205,7 +263,8 @@ export const productsRouter = createTRPCRouter({
           } else if (typeof val === 'number') {
             dbRecord[dbCol] = val === 1 ? 1 : 0;
           } else if (typeof val === 'string' && val.trim().length > 0) {
-            dbRecord[dbCol] = val.trim() === 'oferta' || val.trim() === 'true' || val.trim() === '1' ? 1 : 0;
+            dbRecord[dbCol] =
+              val.trim() === 'oferta' || val.trim() === 'true' || val.trim() === '1' ? 1 : 0;
           } else {
             if (field.validation?.required) {
               throw new TRPCError({
@@ -230,34 +289,108 @@ export const productsRouter = createTRPCRouter({
         }
       }
 
-      // 3. Metadatos del sistema adicionales a insertar
-      const extraColumns: Record<string, unknown> = {
-        oasis_one_user_id: oasisOneUserId,
-        created_by_username: createdByUsername,
-        is_active: 1,
-      };
-
-      // 4. Construir dinámicamente la consulta INSERT con nombres de columnas y placeholders
-      const tableName = productFormSchema.dbTable || 'tb_products';
-      const { sql, params } = buildDynamicInsertSql(tableName, dbRecord, extraColumns);
-
+      // 4. Operaciones en base de datos bajo transacción
+      const connection = await clownfishDb.getConnection();
       try {
-        const [result] = await clownfishDb.execute<ResultSetHeader>(
-          sql,
-          params as (string | number | boolean | Date | null | Buffer)[]
-        );
-        return {
-          success: true,
-          message: 'Producto guardado con éxito.',
-          affectedRows: result.affectedRows,
-        };
+        await connection.beginTransaction();
+
+        if (existingProduct) {
+          // Caso A: El producto ya existe para esas 4 llaves maestras
+          const productId = existingProduct.id;
+
+          // 1. Actualizar tb_products con los datos vigentes (precio, en_oferta, foto, observaciones)
+          await connection.execute<ResultSetHeader>(
+            `UPDATE tb_products
+             SET precio = ?,
+                 en_oferta = ?,
+                 foto = ?,
+                 observaciones = ?,
+                 updated_at = NOW()
+             WHERE id = ?`,
+            [
+              Number(dbRecord.precio),
+              Number(dbRecord.en_oferta ?? 0),
+              String(dbRecord.foto ?? ''),
+              dbRecord.observaciones ? String(dbRecord.observaciones) : null,
+              productId,
+            ]
+          );
+
+          // 2. Insertar nuevo registro en el historial de precios
+          await connection.execute<ResultSetHeader>(
+            `INSERT INTO tb_product_price_history (
+               id, product_id, precio, en_oferta, observaciones, oasis_one_user_id
+             ) VALUES (UUID(), ?, ?, ?, ?, ?)`,
+            [
+              productId,
+              Number(dbRecord.precio),
+              Number(dbRecord.en_oferta ?? 0),
+              dbRecord.observaciones ? String(dbRecord.observaciones) : null,
+              oasisOneUserId,
+            ]
+          );
+
+          await connection.commit();
+
+          return {
+            success: true,
+            isNewProduct: false,
+            productId,
+            message:
+              'El producto ya existe en esta ubicación. Se ha registrado un nuevo precio en el historial.',
+          };
+        } else {
+          // Caso B: Producto nuevo -> Se inserta en tb_products y se inicializa su historial
+          const productId = crypto.randomUUID();
+
+          const extraColumns: Record<string, unknown> = {
+            id: productId,
+            oasis_one_user_id: oasisOneUserId,
+            created_by_username: createdByUsername,
+            is_active: 1,
+          };
+
+          const tableName = productFormSchema.dbTable || 'tb_products';
+          const { sql, params } = buildDynamicInsertSql(tableName, dbRecord, extraColumns);
+
+          await connection.execute<ResultSetHeader>(
+            sql,
+            params as (string | number | boolean | Date | null | Buffer)[]
+          );
+
+          // Registro inicial en el historial de precios
+          await connection.execute<ResultSetHeader>(
+            `INSERT INTO tb_product_price_history (
+               id, product_id, precio, en_oferta, observaciones, oasis_one_user_id
+             ) VALUES (UUID(), ?, ?, ?, ?, ?)`,
+            [
+              productId,
+              Number(dbRecord.precio),
+              Number(dbRecord.en_oferta ?? 0),
+              dbRecord.observaciones ? String(dbRecord.observaciones) : null,
+              oasisOneUserId,
+            ]
+          );
+
+          await connection.commit();
+
+          return {
+            success: true,
+            isNewProduct: true,
+            productId,
+            message: 'Producto registrado con éxito.',
+          };
+        }
       } catch (dbErr: unknown) {
-        console.error('[DB Insert Error]:', dbErr);
+        await connection.rollback();
+        console.error('[DB Operation Error]:', dbErr);
         const errMsg = dbErr instanceof Error ? dbErr.message : String(dbErr);
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: `Error al guardar en base de datos: ${errMsg}`,
+          message: `Error al procesar el producto en base de datos: ${errMsg}`,
         });
+      } finally {
+        connection.release();
       }
     }),
 });
