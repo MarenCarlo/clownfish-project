@@ -40,7 +40,7 @@ export default function ProductosPage() {
 
   const createProductMutation = api.products.createProduct.useMutation({
     onSuccess: (res) => {
-      toast.success(res.message || 'Producto registrado correctamente.');
+      toast.success(res.message || 'Producto guardado con éxito.');
       setIsConfirmModalOpen(false);
       setPendingValues(null);
       formRef.current?.reset();

@@ -336,8 +336,7 @@ export const productsRouter = createTRPCRouter({
             success: true,
             isNewProduct: false,
             productId,
-            message:
-              'El producto ya existe en esta ubicación. Se ha registrado un nuevo precio en el historial.',
+            message: 'Producto guardado con éxito.',
           };
         } else {
           // Caso B: Producto nuevo -> Se inserta en tb_products y se inicializa su historial
@@ -378,7 +377,7 @@ export const productsRouter = createTRPCRouter({
             success: true,
             isNewProduct: true,
             productId,
-            message: 'Producto registrado con éxito.',
+            message: 'Producto guardado con éxito.',
           };
         }
       } catch (dbErr: unknown) {
