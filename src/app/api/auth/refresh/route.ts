@@ -42,25 +42,20 @@ export async function PATCH() {
 
   try {
     const [rows] = await authDb.execute<RowDataPacket[]>(
-      'SELECT id, username, is_active, first_name, last_name, email FROM auth_user WHERE id = ? LIMIT 1',
+      'SELECT id, username, is_active, first_name, last_name, email FROM auth_user WHERE id = ? AND is_active = 1 LIMIT 1',
       [decoded.userId]
     );
 
     if (!rows || rows.length === 0) {
+      cookieStore.delete('token');
+      cookieStore.delete('refreshToken');
       return NextResponse.json(
-        { status: 401, error: true, message: 'Usuario no encontrado' },
+        { status: 401, error: true, message: 'Sesión inválida o expirada.' },
         { status: 401 }
       );
     }
 
-    const user = rows[0];
-
-    if (!user.is_active) {
-      return NextResponse.json(
-        { status: 401, error: true, message: 'Usuario inactivo' },
-        { status: 401 }
-      );
-    }
+    const user = rows[0]!;
 
     const accessTokenPayload = {
       userId: user.id,

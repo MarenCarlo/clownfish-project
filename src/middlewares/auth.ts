@@ -49,12 +49,11 @@ export async function authenticateUser(
   if (!username || !password) return null;
   try {
     const [rows] = await authDb.execute<RowDataPacket[]>(
-      'SELECT id, username, password, is_active, first_name, last_name, email FROM auth_user WHERE username = ? OR email = ? LIMIT 1',
+      'SELECT id, username, password, is_active, first_name, last_name, email FROM auth_user WHERE (username = ? OR email = ?) AND is_active = 1 LIMIT 1',
       [username, username]
     );
     if (!rows || rows.length === 0) return null;
-    const user = rows[0];
-    if (!user.is_active) return null;
+    const user = rows[0]!;
 
     const isValid = verifyDjangoPassword(password, user.password);
     if (isValid) {
@@ -69,7 +68,7 @@ export async function authenticateUser(
     }
     return null;
   } catch (error) {
-    console.error('Error autenticando usuario en BD oasis_one:', error);
+    console.error('Error autenticando usuario:', error);
     return null;
   }
 }

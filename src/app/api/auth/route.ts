@@ -27,7 +27,7 @@ export async function POST(request: Request) {
         {
           status: 400,
           error: true,
-          message: 'Usuario no existe, está inactivo o la contraseña es incorrecta.',
+          message: 'Usuario o contraseña incorrectos.',
           data: {},
         },
         { status: 400 }
